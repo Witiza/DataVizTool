@@ -16,3 +16,26 @@ public class EventManager : MonoBehaviour
         
     }
 }
+
+public class BaseEvent
+{
+    string name;
+    int playerID;
+    int sessionID;
+    float timestamp;
+};
+
+class BoolEvent : BaseEvent
+{
+    bool boolean;
+};
+
+class IntEvent : BaseEvent
+{
+    int integer;
+};
+
+class FloatEvent : BaseEvent
+{
+    float floating;
+};
