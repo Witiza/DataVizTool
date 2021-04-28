@@ -113,6 +113,7 @@ namespace Gamekit3D
         // Called automatically by Unity when the script is first added to a gameobject or is reset from the context menu.
         void Reset()
         {
+
             meleeWeapon = GetComponentInChildren<MeleeWeapon>();
 
             Transform footStepSource = transform.Find("FootstepSource");
@@ -154,6 +155,7 @@ namespace Gamekit3D
         // Called automatically by Unity after Awake whenever the script is enabled. 
         void OnEnable()
         {
+            EventHandler.StoreEventStatic("Start", true);
             SceneLinkedSMB<PlayerController>.Initialise(m_Animator, this);
 
             m_Damageable = GetComponent<Damageable>();

@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 public enum DataEventType
 {
     DEFAULT,
-    GLOBAL,
+    ROTATION,
     POSITION,
     LEVEL_START,
     LEVEL_SUCCESS,
@@ -30,11 +30,10 @@ public enum DataType
 public class EventHandler : MonoBehaviour
 {
     public List<StandardEvent> events = new List<StandardEvent>();
-    List<List<BaseEvent>> ingame_events = new List<List<BaseEvent>>();
 
     void OnEnable()
     {
-        LoadEditorEvents();
+     
     }
 
     private void OnDisable()
@@ -43,10 +42,13 @@ public class EventHandler : MonoBehaviour
     }
     private void Awake()
     {
+        //HELLO?
+
         LoadEditorEvents();
         for (int i = 0; i < events.Count; i++)
         {
             events[i].ingame_events = new List<BaseEvent>();
+            Debug.Log("Hello??" + events[i].ingame_events.Count);
         }
     }
     void Start()
@@ -57,25 +59,80 @@ public class EventHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        for(int i = 0;i<events.Count;i++)
+        for (int i = 0;i<events.Count;i++)
         {
             StandardEvent tmp = events[i];
+            Debug.Log(events[i].ingame_events.Count);
             if(tmp.use_frequency)
             {
                 tmp.current_interval += Time.deltaTime;
                 if(tmp.current_interval >= tmp.interval )
                 {
-
+                    switch(tmp.type)
+                    {
+                        //case DataEventType.POSITION:
+                        //    tmp.StoreEvent(tmp.target.transform.position);
+                        //    break;
+                        case DataEventType.ROTATION:
+                            tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles);
+                            break;
+                    }
                 }
             }
         }
     }
 
+    static public void StoreEventStatic(string event_name, bool data)
+    {
+        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
+        EventHandler tmp = (EventHandler)FindObjectOfType(typeof(EventHandler));
+        tmp.StoreEvent(event_name, data);
+    }
+
+    public void StoreEvent(string event_name, bool data)
+    {
+        for(int i = 0;i<events.Count;i++)
+        {
+            if(events[i].name == event_name)
+            {
+                events[i].StoreEvent(data);
+            }
+        }
+    }
+    public void StoreEvent(string event_name, int data)
+    {
+        for (int i = 0; i < events.Count; i++)
+        {
+            if (events[i].name == event_name)
+            {
+                events[i].StoreEvent(data);
+            }
+        }
+    }
+    public void StoreEvent(string event_name, float data)
+    {
+        for (int i = 0; i < events.Count; i++)
+        {
+            if (events[i].name == event_name)
+            {
+                events[i].StoreEvent(data);
+            }
+        }
+    }
+    public void StoreEvent(string event_name, Vector3 data)
+    {
+        for (int i = 0; i < events.Count; i++)
+        {
+            if (events[i].name == event_name)
+            {
+                events[i].StoreEvent(data);
+            }
+        }
+    }
     void IntervalEvents()
     {
 
     }
-
     public void AddEvent()
     {
         StandardEvent tmp = new StandardEvent();
@@ -87,10 +144,10 @@ public class EventHandler : MonoBehaviour
         string path = Application.persistentDataPath + "/EditorEvents/";
         Directory.CreateDirectory(path);
         path += "Events.dta";
-        Debug.Log(path);
         FileStream fs = new FileStream(path, FileMode.Create);
         BinaryFormatter formatter = new BinaryFormatter();
         formatter.Serialize(fs, events);
+        fs.Close();
     }
 
    public  void LoadEditorEvents()
@@ -105,6 +162,13 @@ public class EventHandler : MonoBehaviour
                 events = (List<StandardEvent>)formater.Deserialize(stream);
             }
             stream.Close();
+        }
+        for(int i = 0;i<events.Count;i++)
+        {
+            if(events[i].target_name != null&& events[i].target_name != "")
+            {
+                GameObject.Find(events[i].target_name);
+            }
         }
     }
 }
@@ -123,68 +187,76 @@ public class EventHandlerEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        handler = (EventHandler)target;
-        if (!loaded_events)
+        if (!Application.isPlaying)
         {
-            handler.LoadEditorEvents();
-            loaded_events = true;
-        }
-
-        //DrawDefaultInspector();
-
-
-        
-        EditorGUILayout.HelpBox("This is a help box", MessageType.Info);
-        if(GUILayout.Button("Add Event"))
-        {
-            handler.AddEvent();
-            bool tmp = false;
-            foldouts.Add(tmp);
-        }
-        if(foldouts.Count!=handler.events.Count)
-        {
-            GenerateFoldouts();
-        }
-        for(int i = 0;i < handler.events.Count; i++)
-        {
-            //StandardEvent tmp = events.GetArrayElementAtIndex(i).objectReferenceValue as StandardEvent;
-            StandardEvent tmp = handler.events[i];
-            foldouts[i] = EditorGUILayout.BeginFoldoutHeaderGroup(foldouts[i], tmp.name);
-            if (foldouts[i])
+            handler = (EventHandler)target;
+            if (!loaded_events)
             {
-                tmp.name = EditorGUILayout.TextField("Event Name: ", tmp.name);
-                tmp.type = (DataEventType)EditorGUILayout.EnumPopup("Event Type: ", tmp.type);
-                if(tmp.use_frequency = EditorGUILayout.Toggle("Use Frequency", tmp.use_frequency))
-                {
-                    tmp.interval = EditorGUILayout.FloatField("Event Frequency", tmp.interval);
-                }
-                switch (tmp.type)
-                {
-                    case DataEventType.POSITION:
-                        tmp.target_name = EditorGUILayout.TextField("Name of the target GameObject: ", tmp.target_name);
-                        break;
-                    case DataEventType.CUSTOM:
-                        tmp.data_type = (DataType)EditorGUILayout.EnumPopup("Data Type: ", tmp.data_type);
-                        break;
-                };
-                if (GUILayout.Button("Delete Event"))
-                {
-                    handler.events.RemoveAt(i);
-                    foldouts.RemoveAt(i);
-                }
+                handler.LoadEditorEvents();
+                loaded_events = true;
             }
-            EditorGUILayout.EndFoldoutHeaderGroup();      
-        }
 
-        if (GUILayout.Button("TEST"))
-        {
-            StreamReader text = new StreamReader("Assets/Resources/SampleEvent.txt");
-            string sample = text.ReadToEnd();
-            File.WriteAllText("Assets/ToolForDataCollection/Utilities/SampleEvent.cs", sample);
-            AssetDatabase.Refresh();
-            Debug.Log(sample);
-            //path += "/Utilities/";
-            //Debug.Log(path);
+            //DrawDefaultInspector();
+
+
+
+            EditorGUILayout.HelpBox("This is a help box", MessageType.Info);
+            if (GUILayout.Button("Add Event"))
+            {
+                handler.AddEvent();
+                bool tmp = false;
+                foldouts.Add(tmp);
+            }
+            if (foldouts.Count != handler.events.Count)
+            {
+                GenerateFoldouts();
+            }
+            for (int i = 0; i < handler.events.Count; i++)
+            {
+                //StandardEvent tmp = events.GetArrayElementAtIndex(i).objectReferenceValue as StandardEvent;
+                StandardEvent tmp = handler.events[i];
+                foldouts[i] = EditorGUILayout.BeginFoldoutHeaderGroup(foldouts[i], tmp.name);
+                if (foldouts[i])
+                {
+                    tmp.name = EditorGUILayout.TextField("Event Name: ", tmp.name);
+                    tmp.type = (DataEventType)EditorGUILayout.EnumPopup("Event Type: ", tmp.type);
+                    if (tmp.use_frequency = EditorGUILayout.Toggle("Use Frequency", tmp.use_frequency))
+                    {
+                        tmp.interval = EditorGUILayout.FloatField("Event Frequency", tmp.interval);
+                    }
+                    switch (tmp.type)
+                    {
+                        case DataEventType.POSITION:
+
+                            if (tmp.target = (GameObject)EditorGUILayout.ObjectField("Target GameObject", tmp.target, typeof(GameObject), true))
+                            {
+                                tmp.target_name = tmp.target.name;
+                            }
+                            break;
+                        case DataEventType.CUSTOM:
+                            tmp.data_type = (DataType)EditorGUILayout.EnumPopup("Data Type: ", tmp.data_type);
+                            break;
+                    };
+                    if (GUILayout.Button("Delete Event"))
+                    {
+                        handler.events.RemoveAt(i);
+                        foldouts.RemoveAt(i);
+                    }
+                }
+                EditorGUILayout.EndFoldoutHeaderGroup();
+                handler.SaveEditorEvents();
+            }
+
+            if (GUILayout.Button("TEST"))
+            {
+                StreamReader text = new StreamReader("Assets/Resources/SampleEvent.txt");
+                string sample = text.ReadToEnd();
+                File.WriteAllText("Assets/ToolForDataCollection/Utilities/SampleEvent.cs", sample);
+                AssetDatabase.Refresh();
+                Debug.Log(sample);
+                //path += "/Utilities/";
+                //Debug.Log(path);
+            }
         }
     }
 
@@ -208,14 +280,19 @@ public class StandardEvent
     uint eventID = 0;
     public string name;
     string scene;
-    public string target_name;
+    public string target_name="";
+    [System.NonSerialized]
+    public GameObject target = null;
     [System.NonSerialized]
     Vector3 position;
-    [System.NonSerialized]
+   [System.NonSerialized]
     public List<BaseEvent> ingame_events;
     public DataEventType type;
     public DataType data_type;
     public bool use_frequency;
+    int playerID;
+    int sessionID;
+
 
     [System.NonSerialized]
     float event_float;
@@ -229,12 +306,29 @@ public class StandardEvent
        // generateID();
         type =DataEventType.DEFAULT;
         data_type = DataType.NULL;
+        ingame_events = new List<BaseEvent>();
       //  scene = SceneManager.GetActiveScene().name;
     }
 
-    public void StoreEvent()
+    public void StoreEvent(bool ev)
     {
-       //Need different types of variables
+        BoolEvent tmp = new BoolEvent(ev,name,playerID,sessionID);
+        ingame_events.Add(tmp);
+    }
+    public void StoreEvent(int ev)
+    {
+        IntEvent tmp = new IntEvent(ev, name, playerID, sessionID);
+        ingame_events.Add(tmp);
+    }
+    public void StoreEvent(float ev)
+    {
+        FloatEvent tmp = new FloatEvent(ev, name, playerID, sessionID);
+        ingame_events.Add(tmp);
+    }
+    public void StoreEvent(Vector3 ev)
+    {
+        Vector3Event tmp = new Vector3Event(ev, name, playerID, sessionID);
+        ingame_events.Add(tmp);
     }
 
     void generateID()
