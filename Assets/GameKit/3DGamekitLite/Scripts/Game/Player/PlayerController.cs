@@ -138,6 +138,7 @@ namespace Gamekit3D
                 if (cameraSettings.lookAt == null)
                     cameraSettings.follow = transform.Find("HeadTarget");
             }
+
         }
 
         // Called automatically by Unity when the script first exists in the scene.
@@ -152,10 +153,14 @@ namespace Gamekit3D
             s_Instance = this;
         }
 
+        void Start()
+        {
+            EventHandler.StoreEventStatic("Start", true);
+        }
         // Called automatically by Unity after Awake whenever the script is enabled. 
         void OnEnable()
         {
-            EventHandler.StoreEventStatic("Start", true);
+
             SceneLinkedSMB<PlayerController>.Initialise(m_Animator, this);
 
             m_Damageable = GetComponent<Damageable>();

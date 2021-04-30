@@ -33,23 +33,30 @@ public class EventHandler : MonoBehaviour
 
     void OnEnable()
     {
-     
-    }
-
-    private void OnDisable()
-    {
-        SaveEditorEvents();
-    }
-    private void Awake()
-    {
-        //HELLO?
-
         LoadEditorEvents();
         for (int i = 0; i < events.Count; i++)
         {
             events[i].ingame_events = new List<BaseEvent>();
             Debug.Log("Hello??" + events[i].ingame_events.Count);
         }
+    }
+
+    private void OnDisable()
+    {
+        SaveEditorEvents();
+        if (Application.isPlaying)
+        {
+            for (int i = 0; i < events.Count; i++)
+            {
+                CSVhandling.SaveToCSV(events[i]);
+            }
+        }
+    }
+    private void Awake()
+    {
+        //HELLO?
+
+       
     }
     void Start()
     {
@@ -62,7 +69,7 @@ public class EventHandler : MonoBehaviour
         for (int i = 0;i<events.Count;i++)
         {
             StandardEvent tmp = events[i];
-            Debug.Log(events[i].ingame_events.Count);
+            Debug.Log(events[i].name + ": "+ events[i].ingame_events.Count);
             if(tmp.use_frequency)
             {
                 tmp.current_interval += Time.deltaTime;
@@ -70,23 +77,70 @@ public class EventHandler : MonoBehaviour
                 {
                     switch(tmp.type)
                     {
-                        //case DataEventType.POSITION:
-                        //    tmp.StoreEvent(tmp.target.transform.position);
-                        //    break;
+                        case DataEventType.POSITION:
+                            tmp.StoreEvent(tmp.target.transform.position);
+                            break;
                         case DataEventType.ROTATION:
                             tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles);
                             break;
                     }
+                    tmp.current_interval = 0;
                 }
             }
         }
     }
 
-    static public void StoreEventStatic(string event_name, bool data)
+    static public void StoreEventStatic(string event_name, bool data) 
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        EventHandler tmp = (EventHandler)FindObjectOfType(typeof(EventHandler));
-        tmp.StoreEvent(event_name, data);
+        EventHandler tmp;
+        if (tmp=  (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        {
+            tmp.StoreEvent(event_name, data);
+        }
+        else
+        {
+            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+        }
+    }
+    static public void StoreEventStatic(string event_name, int data)
+    {
+        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
+        EventHandler tmp;
+        if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        {
+            tmp.StoreEvent(event_name, data);
+        }
+        else
+        {
+            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+        }
+    }
+    static public void StoreEventStatic(string event_name, float data)
+    {
+        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
+        EventHandler tmp;
+        if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        {
+            tmp.StoreEvent(event_name, data);
+        }
+        else
+        {
+            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+        }
+    }
+    static public void StoreEventStatic(string event_name, Vector3 data)
+    {
+        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
+        EventHandler tmp;
+        if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        {
+            tmp.StoreEvent(event_name, data);
+        }
+        else
+        {
+            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+        }
     }
 
     public void StoreEvent(string event_name, bool data)
@@ -129,10 +183,7 @@ public class EventHandler : MonoBehaviour
             }
         }
     }
-    void IntervalEvents()
-    {
 
-    }
     public void AddEvent()
     {
         StandardEvent tmp = new StandardEvent();
@@ -167,10 +218,17 @@ public class EventHandler : MonoBehaviour
         {
             if(events[i].target_name != null&& events[i].target_name != "")
             {
-                GameObject.Find(events[i].target_name);
+              
+                if(!(events[i].target = GameObject.Find(events[i].target_name)))
+                {
+                    Debug.LogError("Couldnt find target GameObject for event: " + events[i].name);
+                }
+                
             }
         }
     }
+
+
 }
 
 
@@ -275,7 +333,7 @@ public class EventHandlerEditor : Editor
 [System.Serializable]
 public class StandardEvent
 {
-    public float interval = 0;
+    public float interval = 1;
     public float current_interval = 0;
     uint eventID = 0;
     public string name;

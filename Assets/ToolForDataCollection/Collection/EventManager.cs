@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class EventManager : MonoBehaviour
 {
@@ -28,41 +29,67 @@ public class BaseEvent
         name = _name;
         playerID = player_id;
         sessionID = session_id;
-        timestamp = System.DateTime.UtcNow.Millisecond.ToString();
+        timestamp = System.DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss.fff");
+    }
+
+    public virtual void saveToCSV(StreamWriter file)
+    {
+        file.Write(name + "," + playerID + "," + sessionID + "," + timestamp + ",");
     }
 };
 
 class BoolEvent : BaseEvent
 {
-    bool boolean;
+    bool data;
     public BoolEvent(bool ev, string _name, int player_id, int session_id):base(_name,player_id,session_id)
     {
-        boolean = ev;
+        data = ev;
+    }
+    public override void saveToCSV(StreamWriter file)
+    {
+        base.saveToCSV(file);
+        file.WriteLine(data);
     }
 };
 
 class IntEvent : BaseEvent
 {
-    int integer;
+    int data;
     public IntEvent(int ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
     {
-        integer = ev;
+        data = ev;
+    }
+    public override void saveToCSV(StreamWriter file)
+    {
+        base.saveToCSV(file);
+        file.WriteLine(data);
     }
 };
 
 class FloatEvent : BaseEvent
 {
-    float floating;
+    float data;
     public FloatEvent(float ev, string _name, int player_id, int session_id ) : base(_name, player_id, session_id)
     {
-        floating = ev;
+        data = ev;
+    }
+    public override void saveToCSV(StreamWriter file)
+    {
+        base.saveToCSV(file);
+        file.WriteLine(data);
     }
 };
 class Vector3Event :BaseEvent
 {
-    Vector3 vector;
+    Vector3 data;
     public Vector3Event(Vector3 ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
     {
-        vector = ev;
+        data = ev;
+    }
+    public override void saveToCSV(StreamWriter file)
+    {
+        base.saveToCSV(file);
+        file.WriteLine(data.x+","+data.y+","+data.z);
+        
     }
 }
