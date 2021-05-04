@@ -27,7 +27,7 @@ public class ViewerWindow : EditorWindow
     }
     void generateTexture()
     {
-        texture = new RenderTexture((int)position.width, (int)position.height, (int)RenderTextureFormat.ARGB32);
+        texture = new RenderTexture((int)position.width/2, (int)position.height, (int)RenderTextureFormat.ARGB32);
 
     }
     public void OnEnable()
@@ -54,14 +54,15 @@ public class ViewerWindow : EditorWindow
             if (camera != null)
             {
                 camera.targetTexture = texture;
+
                 camera.Render();
                 camera.targetTexture = null;
             }
-            if (texture.width != position.width ||
-                texture.height != position.height)
-                texture = new RenderTexture((int)position.width,
-                    (int)position.height,
-                    (int)RenderTextureFormat.ARGB32);
+            //if (texture.width != position.width ||
+            //    texture.height != position.height)
+            //    texture = new RenderTexture((int)position.width/2,
+            //        (int)position.height,
+            //        (int)RenderTextureFormat.ARGB32);
         }
         else
         {
