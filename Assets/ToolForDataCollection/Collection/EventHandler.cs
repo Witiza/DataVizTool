@@ -7,9 +7,8 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 public enum DataEventType
 {
-    DEFAULT,
-    ROTATION,
     POSITION,
+    ROTATION,
     LEVEL_START,
     LEVEL_SUCCESS,
     LEVEL_FAILURE,
@@ -18,7 +17,6 @@ public enum DataEventType
 
 public enum DataType
 {
-    NULL,
     BOOL,
     INT,
     FLOAT,
@@ -48,7 +46,7 @@ public class EventHandler : MonoBehaviour
         {
             for (int i = 0; i < events.Count; i++)
             {
-                CSVhandling.SaveToCSV(events[i]);
+                CSVhandling.SaveToCSV(events[i],SceneManager.GetActiveScene().name);
             }
         }
     }
@@ -277,7 +275,25 @@ public class EventHandlerEditor : Editor
                 if (foldouts[i])
                 {
                     tmp.name = EditorGUILayout.TextField("Event Name: ", tmp.name);
+                    GUI.changed = false;
                     tmp.type = (DataEventType)EditorGUILayout.EnumPopup("Event Type: ", tmp.type);
+                    if(GUI.changed)
+                    {
+                        Debug.Log("UEAP");
+                        switch(tmp.type)
+                        {
+                            
+                            case DataEventType.LEVEL_START: 
+                            case DataEventType.LEVEL_FAILURE: 
+                            case DataEventType.LEVEL_SUCCESS:
+                                tmp.data_type = DataType.BOOL;
+                           break;
+                            case DataEventType.POSITION:
+                            case DataEventType.ROTATION:
+                                tmp.data_type = DataType.VECTOR3;
+                            break;
+                        }
+                    }
                     if (tmp.use_frequency = EditorGUILayout.Toggle("Use Frequency", tmp.use_frequency))
                     {
                         tmp.interval = EditorGUILayout.FloatField("Event Frequency", tmp.interval);
@@ -362,8 +378,8 @@ public class StandardEvent
     {
         name = "EVENTNAME";
        // generateID();
-        type =DataEventType.DEFAULT;
-        data_type = DataType.NULL;
+        type =DataEventType.CUSTOM;
+        data_type = DataType.INT;
         ingame_events = new List<BaseEvent>();
       //  scene = SceneManager.GetActiveScene().name;
     }
@@ -389,6 +405,32 @@ public class StandardEvent
         ingame_events.Add(tmp);
     }
 
+    public string dataTypeToString()
+    {
+        string ret="ERROR";
+        switch(data_type)
+        {
+            case DataType.BOOL:
+                ret = "BOOL";
+                break;
+            case DataType.INT:
+                ret = "INT";
+                break;
+            case DataType.FLOAT:
+                ret = "FLOAT";
+                break;
+            case DataType.CHAR:
+                ret = "CHAR";
+                break;
+            case DataType.STRING:
+                ret = "STRING";
+                break;
+            case DataType.VECTOR3:
+                ret = "VECTOR3";
+                break;
+        }
+        return ret;
+    }
     void generateID()
     {
         eventID = (uint)Random.Range(1, 999); //TEMPORARY

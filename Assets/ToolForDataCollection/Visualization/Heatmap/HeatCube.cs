@@ -9,12 +9,14 @@ public class HeatCube
     static Material lineMaterial =null;
     Vector3 position;
     Material mat;
+    
 
     Matrix4x4 transform;
 
     public HeatCube(Vector3 position,Vector3 scale)
     {
         transform = Matrix4x4.TRS(position, Quaternion.identity, scale);
+        mesh = Shapes.GetUnityPrimitiveMesh(PrimitiveType.Cube);
         CreateLineMaterial();
     }
 
@@ -31,8 +33,8 @@ public class HeatCube
             //lineMaterial.hideFlags = HideFlags.HideAndDontSave;
 
             // Turn on alpha blending
-           // lineMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            //lineMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+           mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
             // Turn backface culling off
             //  lineMaterial.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
             // Turn off depth writes
@@ -42,12 +44,6 @@ public class HeatCube
     }
     public void RenderHeat()
     {
-        CreateLineMaterial();
-        //if i dont have this here, the material appears lila??
-      //  mat = new Material(Shader.Find("Unlit/Color"));
-
-
-        mesh = Shapes.GetUnityPrimitiveMesh(PrimitiveType.Sphere);
         Graphics.DrawMesh(mesh,transform,mat,0); //LAYER AS AN OPTION
     }
 }
