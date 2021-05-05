@@ -10,14 +10,14 @@ public class DataViewer : MonoBehaviour
     public int lineCount = 100;
     public float radius = 3.0f;
 
-    Camera camera;
+    Camera texture_camera;
     RenderTexture texture;
 
     static Material lineMaterial;
 
     void Start()
     {
-        camera = GetComponent<Camera>();
+        texture_camera = GetComponent<Camera>();
         CreateLineMaterial();
         //texture = new RenderTexture((int)positio)
     }
@@ -46,7 +46,7 @@ public class DataViewer : MonoBehaviour
     private void OnRenderObject()
     {
 
-        if (Camera.current == camera)
+        if (Camera.current == texture_camera)
         { 
             CreateLineMaterial();
             lineMaterial.SetPass(0);
