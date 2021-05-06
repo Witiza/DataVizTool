@@ -49,42 +49,42 @@ public static  class CSVhandling
                     ret.type = DataType.BOOL;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new BoolEvent(line));
+                        ret.events.Add(new BoolEvent(line,name));
                      }
                     break;
                 case "INT":
                     ret.type = DataType.INT;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new IntEvent(line));
+                        ret.events.Add(new IntEvent(line,name));
                     }
                     break;
                 case "FLOAT":
                     ret.type = DataType.FLOAT;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new FloatEvent(line));
+                        ret.events.Add(new FloatEvent(line,name));
                     }
                     break;
                 case "CHAR":
                     ret.type = DataType.CHAR;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new CharEvent(line));
+                        ret.events.Add(new CharEvent(line,name));
                     }
                     break;
                 case "STRING":
                     ret.type = DataType.STRING;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new StringEvent(line));
+                        ret.events.Add(new StringEvent(line,name));
                     }
                     break;
                 case "VECTOR3":
                     ret.type = DataType.VECTOR3;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new Vector3Event(line));
+                        ret.events.Add(new Vector3Event(line,name));
                     }
                     break;
             }

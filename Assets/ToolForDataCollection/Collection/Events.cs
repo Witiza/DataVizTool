@@ -10,13 +10,14 @@ public class EventContainer
         name = _name;
         events = new List<BaseEvent>();
     }
-    string name;
+    public bool in_use = true;
+    public string name;
     public DataType type;
     public List<BaseEvent> events;
 }
 public class BaseEvent
 {
-    string name;
+    public string name;
     int playerID;
     int sessionID;
     string timestamp;
@@ -28,8 +29,9 @@ public class BaseEvent
         timestamp = System.DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss.fff");
     }
 
-    public BaseEvent(string line)
+    public BaseEvent(string line, string _name)
     {
+        name = _name;
         int start = 0;
         int end = line.IndexOf(',');
         playerID = int.Parse(line.Substring(start, end - start));
@@ -57,7 +59,7 @@ class BoolEvent : BaseEvent
         data = ev;
     }
 
-    public BoolEvent(string line) : base(line)
+    public BoolEvent(string line, string _name):base(line,_name)
     {
         data = bool.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -75,7 +77,7 @@ class IntEvent : BaseEvent
     {
         data = ev;
     }
-    public IntEvent(string line):base(line)
+    public IntEvent(string line, string _name) : base(line, _name)
     {
         data = int.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -93,7 +95,7 @@ class FloatEvent : BaseEvent
     {
         data = ev;
     }
-    public FloatEvent(string line):base(line)
+    public FloatEvent(string line, string _name) : base(line, _name)
     {
         data = float.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -111,7 +113,7 @@ class CharEvent : BaseEvent
     {
         data = ev;
     }
-    public CharEvent(string line) : base(line)
+    public CharEvent(string line, string _name) : base(line, _name)
     {
         data = char.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -129,7 +131,7 @@ class StringEvent : BaseEvent
     {
         data = ev;
     }
-    public StringEvent(string line):base(line)
+    public StringEvent(string line, string _name) : base(line, _name)
     {
         data = line.Substring(line.LastIndexOf(',') + 1);
     }
@@ -139,14 +141,15 @@ class StringEvent : BaseEvent
         file.WriteLine(data);
     }
 };
-class Vector3Event :BaseEvent
+public class Vector3Event :BaseEvent
 {
     public Vector3 data;
     public Vector3Event(Vector3 ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
     {
         data = ev;
     }
-    public Vector3Event(string line):base(line)
+
+    public Vector3Event(string line, string _name) : base(line, _name)
     {
 
         data = new Vector3();
