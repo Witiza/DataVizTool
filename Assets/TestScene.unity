@@ -180,26 +180,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   events:
-  - interval: 0
-    current_interval: 0
-    name: Start
-    target_name: 
-    type: 3
-    data_type: 0
-    use_frequency: 0
-  - interval: 1
-    current_interval: 0.2908102
-    name: Position
-    target_name: Ellen
-    type: 2
-    data_type: 0
-    use_frequency: 1
   - interval: 1
     current_interval: 0
-    name: EVENTNAME
-    target_name: 
-    type: 5
-    data_type: 0
+    name: Test
+    target_name: HeatMap
+    type: 0
+    data_type: 5
     use_frequency: 0
 --- !u!1 &234953256
 GameObject:
@@ -494,6 +480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8754534793a60c45a30c78756ab7d1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cube_size: 1
 --- !u!4 &1786845889
 Transform:
   m_ObjectHideFlags: 0
