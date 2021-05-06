@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 199204127}
   - component: {fileID: 199204126}
+  - component: {fileID: 199204128}
   m_Layer: 0
   m_Name: GameObject (1)
   m_TagString: Untagged
@@ -166,6 +167,40 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &199204128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 199204125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c0297225fac50e44938c52ccc2b62e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  events:
+  - interval: 0
+    current_interval: 0
+    name: Start
+    target_name: 
+    type: 3
+    data_type: 0
+    use_frequency: 0
+  - interval: 1
+    current_interval: 0.2908102
+    name: Position
+    target_name: Ellen
+    type: 2
+    data_type: 0
+    use_frequency: 1
+  - interval: 1
+    current_interval: 0
+    name: EVENTNAME
+    target_name: 
+    type: 5
+    data_type: 0
+    use_frequency: 0
 --- !u!1 &234953256
 GameObject:
   m_ObjectHideFlags: 0

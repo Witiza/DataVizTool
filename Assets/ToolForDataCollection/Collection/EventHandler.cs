@@ -67,7 +67,6 @@ public class EventHandler : MonoBehaviour
         for (int i = 0;i<events.Count;i++)
         {
             StandardEvent tmp = events[i];
-            Debug.Log(events[i].name + ": "+ events[i].ingame_events.Count);
             if(tmp.use_frequency)
             {
                 tmp.current_interval += Time.deltaTime;

@@ -13,34 +13,20 @@ public class test : MonoBehaviour
     Vector3 data;
     void Start()
     {
-        string line = "Position,0,0,04//30//2021 11:57:18.256,69,700000000,2";
+        string path = "Position-TestScene-VECTOR3.csv";
 
         int start = 0;
         int end = 0;
 
-        start = 0;
-        end = line.IndexOf(',');
-        name = line.Substring(start, end-start);
-       
-        start = end+1;
-        end = line.IndexOf(',', start);
-        playerID = int.Parse(line.Substring(start, end-start));
+        string data_type = path.Substring(path.LastIndexOf("-")+1, path.LastIndexOf(".") - path.LastIndexOf("-")-1);
 
-        start = end+1;
-        end = line.IndexOf(',', start);
-        sessionID = int.Parse(line.Substring(start, end-start));
-
-        start = end+1;
-        end = line.IndexOf(',', start);
-        timestamp = line.Substring(start, end-start);
-
-       
-
-     
+        //StandardEvent events = CSVhandling.LoadCSV();
 
 
-        Debug.Log(name);
-        Debug.Log(data);
+
+
+        //Debug.Log(events.ingame_events.Count);
+
        
     }
 

@@ -3,6 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
+public class EventContainer
+{
+    public EventContainer(string _name)
+    {
+        name = _name;
+        events = new List<BaseEvent>();
+    }
+    string name;
+    public DataType type;
+    public List<BaseEvent> events;
+}
 public class BaseEvent
 {
     string name;
@@ -21,10 +32,6 @@ public class BaseEvent
     {
         int start = 0;
         int end = line.IndexOf(',');
-        name = line.Substring(start, end - start);
-
-        start = end + 1;
-        end = line.IndexOf(',', start);
         playerID = int.Parse(line.Substring(start, end - start));
 
         start = end + 1;
@@ -38,13 +45,13 @@ public class BaseEvent
 
     public virtual void saveToCSV(StreamWriter file)
     {
-        file.Write(name + "," + playerID + "," + sessionID + "," + timestamp + ",");
+        file.Write(playerID + "," + sessionID + "," + timestamp + ",");
     }
 };
 
 class BoolEvent : BaseEvent
 {
-    bool data;
+    public bool data;
     public BoolEvent(bool ev, string _name, int player_id, int session_id):base(_name,player_id,session_id)
     {
         data = ev;
@@ -63,7 +70,7 @@ class BoolEvent : BaseEvent
 
 class IntEvent : BaseEvent
 {
-    int data;
+    public int data;
     public IntEvent(int ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
     {
         data = ev;
@@ -81,7 +88,7 @@ class IntEvent : BaseEvent
 
 class FloatEvent : BaseEvent
 {
-    float data;
+    public float data;
     public FloatEvent(float ev, string _name, int player_id, int session_id ) : base(_name, player_id, session_id)
     {
         data = ev;
@@ -99,7 +106,7 @@ class FloatEvent : BaseEvent
 
 class CharEvent : BaseEvent
 {
-    char data;
+    public char data;
     public CharEvent(char ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
     {
         data = ev;
@@ -117,7 +124,7 @@ class CharEvent : BaseEvent
 class StringEvent : BaseEvent
 {
     
-    string data;
+    public string data;
     public StringEvent(string ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
     {
         data = ev;
@@ -134,7 +141,7 @@ class StringEvent : BaseEvent
 };
 class Vector3Event :BaseEvent
 {
-    Vector3 data;
+    public Vector3 data;
     public Vector3Event(Vector3 ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
     {
         data = ev;
@@ -153,7 +160,7 @@ class Vector3Event :BaseEvent
 
         end = start;
         start = line.LastIndexOf(',', end - 2) + 1;
-        data.z = float.Parse(line.Substring(start, end - start - 1));
+        data.x = float.Parse(line.Substring(start, end - start - 1));
 
 
     }

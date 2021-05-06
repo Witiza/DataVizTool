@@ -19,9 +19,10 @@ public static  class CSVhandling
         else
         {
             file = new StreamWriter(path,false);
+            file.WriteLine("EventName,PlayerID,SessionID,Timestamp,Data");
         }
 
-        file.WriteLine("EventName,PlayerID,SessionID,Timestamp,Data");
+       
         for(int i = 0;i<events.ingame_events.Count;i++)
         {
             events.ingame_events[i].saveToCSV(file);
@@ -29,70 +30,70 @@ public static  class CSVhandling
         file.Close();
     }
 
-    public static StandardEvent LoadCSV()
+    public static EventContainer LoadCSV(string name,string scene, string data_type)
     {
-        StandardEvent ret = new StandardEvent();
+        EventContainer ret = new EventContainer(name);
         string path = Application.persistentDataPath + "/events/";
         Directory.CreateDirectory(path);
-        // path += events.name + '-' + scene + ".csv";
-        path += "Position.csv";
+        path += name + '-' + scene + '-'+data_type+".csv";
+        //path += "Position-TestScene-VECTOR3.csv";
         StreamReader file;
         if (File.Exists(path))
         {
             file = new StreamReader(path);
             file.ReadLine();
-            
             string line;
-            string data_type = path.Substring(path.LastIndexOf("-"), path.LastIndexOf(".") - path.LastIndexOf("-"));
-            switch(data_type)
+            switch (data_type)
             {
                 case "BOOL":
+                    ret.type = DataType.BOOL;
                     while ((line = file.ReadLine()) != null)
                     {
-                        
-                        ret.ingame_events.Add(new BoolEvent(line));
+                        ret.events.Add(new BoolEvent(line));
                      }
                     break;
                 case "INT":
+                    ret.type = DataType.INT;
                     while ((line = file.ReadLine()) != null)
                     {
-
-                        ret.ingame_events.Add(new IntEvent(line));
+                        ret.events.Add(new IntEvent(line));
                     }
                     break;
                 case "FLOAT":
+                    ret.type = DataType.FLOAT;
                     while ((line = file.ReadLine()) != null)
                     {
-
-                        ret.ingame_events.Add(new FloatEvent(line));
+                        ret.events.Add(new FloatEvent(line));
                     }
                     break;
                 case "CHAR":
+                    ret.type = DataType.CHAR;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.ingame_events.Add(new CharEvent(line));
+                        ret.events.Add(new CharEvent(line));
                     }
                     break;
                 case "STRING":
+                    ret.type = DataType.STRING;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.ingame_events.Add(new StringEvent(line));
+                        ret.events.Add(new StringEvent(line));
                     }
                     break;
                 case "VECTOR3":
+                    ret.type = DataType.VECTOR3;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.ingame_events.Add(new Vector3Event(line));
+                        ret.events.Add(new Vector3Event(line));
                     }
                     break;
             }
-          
-
+            file.Close();
         }
         else
         {
-            Debug.Log("homie");
+            Debug.Log("Unable to open: "+path);
         }
-        return new StandardEvent();
+        return ret;
     }
 }

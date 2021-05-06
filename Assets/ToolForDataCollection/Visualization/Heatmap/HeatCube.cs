@@ -9,6 +9,7 @@ public class HeatCube
     static Material lineMaterial =null;
     Vector3 position;
     Material mat;
+    int max_events;
     
 
     Matrix4x4 transform;
@@ -24,7 +25,11 @@ public class HeatCube
     {
 
             mat = new Material(Shader.Find("Unlit/Color"));
+            Color mat_color = Color.green;
+            mat_color.a = 0.5;
             mat.color = Color.green;
+            mat.color.a = 0.5;
+
             // Unity has a built-in shader that is useful for drawing
             // simple colored things.
             //Shader shader = Shader.Find("Unlit/Color");
