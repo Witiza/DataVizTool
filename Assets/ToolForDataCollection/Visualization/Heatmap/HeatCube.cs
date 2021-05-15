@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class HeatCube
 {
-    public List<Vector3Event> events = new List<Vector3Event>();
+    public List<BaseEvent> events = new List<BaseEvent>();
     Mesh mesh;
     public Material lineMaterial =null;
     Material mat;
@@ -35,7 +35,7 @@ public class HeatCube
     public int getEventAmount()
     {
         int ret = 0;
-        foreach(Vector3Event tmp in events)
+        foreach(BaseEvent tmp in events)
         {
             if(parent.checkIfUsingEvent(tmp.name))
             {
@@ -47,28 +47,24 @@ public class HeatCube
 
     public void generateColor()
     {
-        //Integer divison LMAOOOOO
-        
-       alpha = (getEventAmount()) / (float)(max_events);
         Color color = parent.gradient.Evaluate(alpha);
         mat.color = color;
     }
   
     public void RenderHeat()
     {
-        if (alpha > 0.0f)
+        if (mat.color.a > 0.0f)
         {
             Graphics.DrawMesh(mesh, transform, mat, 0); //LAYER AS AN OPTION
         }
-
     }
 
     public void generateHeight()
     {
         float median_height = 0;
-        foreach(Vector3Event ev in events)
+        foreach(BaseEvent ev in events)
         {
-            median_height += ev.data.y;
+            median_height += ev.position.y;
         }
         median_height /= events.Count;
         position.y = median_height;

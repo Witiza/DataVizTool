@@ -34,7 +34,7 @@ public class HeatMapViewer : EditorWindow
         {
             //events.Add(CSVhandling.LoadCSV("Position", "TestScene", "VECTOR3"));
             //events.Add(CSVhandling.LoadCSV("Position2", "TestScene", "VECTOR3"));
-            events.Add(CSVhandling.LoadCSV("PositionTest", "ExampleScene", "VECTOR3"));
+            events.Add(CSVhandling.LoadCSV("Position", "ExampleScene", "NULL"));
 
         }
         // Debug.Log("Events count:" + events.Count + "Amount of positions: " + events[0].events.Count);
@@ -94,28 +94,27 @@ public class HeatMapViewer : EditorWindow
     {
         foreach (EventContainer ev in events)
         {
-            if (ev.type == DataType.VECTOR3)
-            {
-                foreach (Vector3Event tmp in ev.events)
+
+                foreach (BaseEvent tmp in ev.events)
                 {
-                    if (tmp.data.x < min_x)
+                    if (tmp.position.x < min_x)
                     {
-                        min_x = tmp.data.x;
+                        min_x = tmp.position.x;
                     }
-                    if (tmp.data.x > max_x)
+                    if (tmp.position.x > max_x)
                     {
-                        max_x = tmp.data.x;
+                        max_x = tmp.position.x;
                     }
-                    if (tmp.data.z < min_z)
+                    if (tmp.position.z < min_z)
                     {
-                        min_z = tmp.data.z;
+                        min_z = tmp.position.z;
                     }
-                    if (tmp.data.z > max_z)
+                    if (tmp.position.z > max_z)
                     {
-                        max_z = tmp.data.z;
+                        max_z = tmp.position.z;
                     }
                 }
-            }
+            
         }
     }
 
@@ -143,7 +142,7 @@ public class HeatMapViewer : EditorWindow
     {
         foreach (EventContainer ev in events)
         {
-            if (ev.type == DataType.VECTOR3)
+            if (ev.use_position)
             {
                 assignEvent(ev);
             }
@@ -175,10 +174,10 @@ public class HeatMapViewer : EditorWindow
     void assignEvent(EventContainer ev)
     {
 
-        foreach (Vector3Event tmp in ev.events)
+        foreach (BaseEvent tmp in ev.events)
         {
-            int x_pos = Mathf.FloorToInt(Mathf.Abs(tmp.data.x - min_x) / cube_size);
-            int z_pos = Mathf.FloorToInt(Mathf.Abs(tmp.data.z - min_z) / cube_size);
+            int x_pos = Mathf.FloorToInt(Mathf.Abs(tmp.position.x - min_x) / cube_size);
+            int z_pos = Mathf.FloorToInt(Mathf.Abs(tmp.position.z - min_z) / cube_size);
             heatmap[x_pos, z_pos].events.Add(tmp);
         }
 

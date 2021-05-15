@@ -14,6 +14,7 @@ public class EventContainer
     public string name;
     public DataType type;
     public List<BaseEvent> events;
+    public bool use_position;
 }
 public class BaseEvent
 {
@@ -21,7 +22,8 @@ public class BaseEvent
     int playerID;
     int sessionID;
     string timestamp;
-    Vector3 position;
+    public Vector3 position;
+
     public BaseEvent(string _name,int player_id, int session_id, Vector3? pos = null)
     {
         name = _name;
@@ -34,7 +36,7 @@ public class BaseEvent
         }
     }
 
-    public BaseEvent(string line, string _name)
+    public BaseEvent(string line, string _name, bool use_position)
     {
         name = _name;
         int start = 0;
@@ -48,11 +50,26 @@ public class BaseEvent
         start = end + 1;
         end = line.IndexOf(',', start);
         timestamp = line.Substring(start, end - start);
+
+        if (use_position)
+        {
+            start = end + 1;
+            end = line.IndexOf(',', start);
+            position.x = float.Parse(line.Substring(start, end - start));
+
+            start = end + 1;
+            end = line.IndexOf(',', start);
+            position.y = float.Parse(line.Substring(start, end - start));
+
+            start = end + 1;
+            end = line.IndexOf(',', start);
+            position.z = float.Parse(line.Substring(start, end - start));
+        }
     }
 
     public virtual void saveToCSV(StreamWriter file)
     {
-        file.Write(playerID + "," + sessionID + "," + timestamp + ",");
+        file.Write(playerID + "," + sessionID + "," + timestamp + ","+position.x+","+position.y+","+position.z+",");
     }
 };
 
@@ -64,7 +81,7 @@ class BoolEvent : BaseEvent
         data = ev;
     }
 
-    public BoolEvent(string line, string _name):base(line,_name)
+    public BoolEvent(string line, string _name,bool use_position):base(line,_name,  use_position)
     {
         data = bool.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -82,7 +99,7 @@ class IntEvent : BaseEvent
     {
         data = ev;
     }
-    public IntEvent(string line, string _name) : base(line, _name)
+    public IntEvent(string line, string _name, bool use_position) : base(line, _name, use_position)
     {
         data = int.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -100,7 +117,7 @@ class FloatEvent : BaseEvent
     {
         data = ev;
     }
-    public FloatEvent(string line, string _name) : base(line, _name)
+    public FloatEvent(string line, string _name, bool use_position) : base(line, _name, use_position)
     {
         data = float.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -118,7 +135,7 @@ class CharEvent : BaseEvent
     {
         data = ev;
     }
-    public CharEvent(string line, string _name) : base(line, _name)
+    public CharEvent(string line, string _name, bool use_position) : base(line, _name, use_position)
     {
         data = char.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -136,7 +153,7 @@ class StringEvent : BaseEvent
     {
         data = ev;
     }
-    public StringEvent(string line, string _name) : base(line, _name)
+    public StringEvent(string line, string _name, bool use_position) : base(line, _name, use_position)
     {
         data = line.Substring(line.LastIndexOf(',') + 1);
     }
@@ -146,15 +163,15 @@ class StringEvent : BaseEvent
         file.WriteLine(data);
     }
 };
-public class Vector3Event :BaseEvent
+public class Vector3Event : BaseEvent
 {
     public Vector3 data;
-    public Vector3Event(Vector3 ev, string _name, int player_id, int session_id, Vector3? pos = null) :base(_name, player_id, session_id, pos)
+    public Vector3Event(Vector3 ev, string _name, int player_id, int session_id, Vector3? pos = null) : base(_name, player_id, session_id, pos)
     {
         data = ev;
     }
 
-    public Vector3Event(string line, string _name) : base(line, _name)
+    public Vector3Event(string line, string _name, bool use_position) : base(line, _name, use_position)
     {
 
         data = new Vector3();
@@ -175,7 +192,7 @@ public class Vector3Event :BaseEvent
     public override void saveToCSV(StreamWriter file)
     {
         base.saveToCSV(file);
-        file.WriteLine(data.x+","+data.y+","+data.z);
-        
+        file.WriteLine(data.x + "," + data.y + "," + data.z);
+
     }
 }

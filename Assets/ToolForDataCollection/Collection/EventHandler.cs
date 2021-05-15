@@ -17,6 +17,7 @@ public enum DataEventType
 
 public enum DataType
 {
+    NULL,
     BOOL,
     INT,
     FLOAT,
@@ -71,14 +72,17 @@ public class EventHandler : MonoBehaviour
                 tmp.current_interval += Time.deltaTime;
                 if(tmp.current_interval >= tmp.interval )
                 {
-                    switch(tmp.type)
+                    if (tmp.target)
                     {
-                        case DataEventType.POSITION:
-                            tmp.StoreEvent(tmp.target.transform.position);
-                            break;
-                        case DataEventType.ROTATION:
-                            tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles);
-                            break;
+                        switch (tmp.type)
+                        {
+                            case DataEventType.POSITION:
+                                tmp.StoreEvent(tmp.target.transform.position);
+                                break;
+                            case DataEventType.ROTATION:
+                                tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles, tmp.target.transform.position);
+                                break;
+                        }
                     }
                     tmp.current_interval = 0;
                 }
@@ -308,18 +312,32 @@ public class EventHandlerEditor : Editor
                         switch(tmp.type)
                         {
                             
-                            case DataEventType.LEVEL_START: 
-                            case DataEventType.LEVEL_FAILURE: 
+                            case DataEventType.LEVEL_START:
+                                tmp.data_type = DataType.BOOL;
+                                break;
+                            case DataEventType.LEVEL_FAILURE:
+                                tmp.data_type = DataType.BOOL;
+                                break;
                             case DataEventType.LEVEL_SUCCESS:
                                 tmp.data_type = DataType.BOOL;
-                           break;
+                                break;
                             case DataEventType.POSITION:
+                                tmp.data_type = DataType.NULL;
+                                tmp.save_position = true;
+                                break;
                             case DataEventType.ROTATION:
                                 tmp.data_type = DataType.VECTOR3;
-                            break;
+                                tmp.save_position = true;
+                                break;
                         }
                     }
-                    if (tmp.use_frequency = EditorGUILayout.Toggle("Use Frequency", tmp.use_frequency))
+                  
+                    if (tmp.type != DataEventType.POSITION && tmp.type != DataEventType.ROTATION)
+                    {
+                        tmp.use_frequency = EditorGUILayout.Toggle("Use Frequency", tmp.use_frequency);
+                        tmp.save_position = EditorGUILayout.Toggle("Save Position", tmp.save_position);
+                    }
+                  if(tmp.use_frequency)
                     {
                         tmp.interval = EditorGUILayout.FloatField("Event Frequency", tmp.interval);
                     }
@@ -357,7 +375,6 @@ public class EventHandlerEditor : Editor
         }
     }
 
-    
 }
 
 [System.Serializable]
@@ -416,10 +433,14 @@ public class StandardEvent
     }
     public void StoreEvent(Vector3 ev, Vector3? pos = null)
     {
-        Vector3Event tmp = new Vector3Event(ev, name, playerID, sessionID,pos);
+        Vector3Event tmp = new Vector3Event(ev, name, playerID, sessionID, pos);
 
         ingame_events.Add(tmp);
-
+    }
+    public void StoreEvent(Vector3 pos)
+    {
+        BaseEvent tmp = new BaseEvent(name, playerID, sessionID, pos);
+        ingame_events.Add(tmp);
     }
 
     public string dataTypeToString()
@@ -427,6 +448,9 @@ public class StandardEvent
         string ret="ERROR";
         switch(data_type)
         {
+            case DataType.NULL:
+                ret = "NULL";
+                break;
             case DataType.BOOL:
                 ret = "BOOL";
                 break;

@@ -19,11 +19,14 @@ public static  class CSVhandling
         else
         {
             file = new StreamWriter(path,false);
+            //First column in metadata indicates if the event uses position;
             if (events.save_position)
             {
+                file.WriteLine("true,");
                 file.WriteLine("PlayerID,SessionID,Timestamp,X,Y,Z,Data");
             }
             else {
+                file.WriteLine("false,");
                 file.WriteLine("PlayerID,SessionID,Timestamp,Data");
             }
         }
@@ -32,6 +35,10 @@ public static  class CSVhandling
         for(int i = 0;i<events.ingame_events.Count;i++)
         {
             events.ingame_events[i].saveToCSV(file);
+            if (events.data_type == DataType.NULL)
+            {
+                file.WriteLine();
+            }
         }
         file.Close();
     }
@@ -42,55 +49,65 @@ public static  class CSVhandling
         string path = Application.persistentDataPath + "/events/";
         Directory.CreateDirectory(path);
         path += name + '-' + scene + '-'+data_type+".csv";
+        Debug.Log("Opening: " + path);
         //path += "Position-TestScene-VECTOR3.csv";
         StreamReader file;
         if (File.Exists(path))
         {
             file = new StreamReader(path);
+
+            ret = readCSVMetadata(file, ret);
             file.ReadLine();
             string line;
             switch (data_type)
             {
+                case "NULL":
+                    ret.type = DataType.NULL;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        ret.events.Add(new BaseEvent(line, name, ret.use_position));
+                    }
+                    break;
                 case "BOOL":
                     ret.type = DataType.BOOL;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new BoolEvent(line,name));
+                        ret.events.Add(new BoolEvent(line,name,ret.use_position));
                      }
                     break;
                 case "INT":
                     ret.type = DataType.INT;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new IntEvent(line,name));
+                        ret.events.Add(new IntEvent(line,name, ret.use_position));
                     }
                     break;
                 case "FLOAT":
                     ret.type = DataType.FLOAT;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new FloatEvent(line,name));
+                        ret.events.Add(new FloatEvent(line,name, ret.use_position));
                     }
                     break;
                 case "CHAR":
                     ret.type = DataType.CHAR;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new CharEvent(line,name));
+                        ret.events.Add(new CharEvent(line,name, ret.use_position));
                     }
                     break;
                 case "STRING":
                     ret.type = DataType.STRING;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new StringEvent(line,name));
+                        ret.events.Add(new StringEvent(line,name, ret.use_position));
                     }
                     break;
                 case "VECTOR3":
                     ret.type = DataType.VECTOR3;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new Vector3Event(line,name));
+                        ret.events.Add(new Vector3Event(line,name, ret.use_position));
                     }
                     break;
             }
@@ -100,6 +117,18 @@ public static  class CSVhandling
         {
             Debug.Log("Unable to open: "+path);
         }
+        return ret;
+    }
+
+    static EventContainer readCSVMetadata(StreamReader file,EventContainer events)
+    {
+        EventContainer ret = events;
+        string line = file.ReadLine();
+
+        int start = 0;
+        int end = line.IndexOf(',');
+
+        events.use_position = bool.Parse(line.Substring(start, end - start));
         return ret;
     }
 }
