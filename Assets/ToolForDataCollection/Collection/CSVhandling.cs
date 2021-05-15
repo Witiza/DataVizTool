@@ -19,7 +19,13 @@ public static  class CSVhandling
         else
         {
             file = new StreamWriter(path,false);
-            file.WriteLine("EventName,PlayerID,SessionID,Timestamp,Data");
+            if (events.save_position)
+            {
+                file.WriteLine("PlayerID,SessionID,Timestamp,X,Y,Z,Data");
+            }
+            else {
+                file.WriteLine("PlayerID,SessionID,Timestamp,Data");
+            }
         }
 
        

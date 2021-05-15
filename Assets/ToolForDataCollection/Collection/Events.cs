@@ -21,12 +21,17 @@ public class BaseEvent
     int playerID;
     int sessionID;
     string timestamp;
-    public BaseEvent(string _name,int player_id, int session_id)
+    Vector3 position;
+    public BaseEvent(string _name,int player_id, int session_id, Vector3? pos = null)
     {
         name = _name;
         playerID = player_id;
         sessionID = session_id;
         timestamp = System.DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss.fff");
+        if(pos != null)
+        {
+            position = pos.GetValueOrDefault();
+        }
     }
 
     public BaseEvent(string line, string _name)
@@ -54,7 +59,7 @@ public class BaseEvent
 class BoolEvent : BaseEvent
 {
     public bool data;
-    public BoolEvent(bool ev, string _name, int player_id, int session_id):base(_name,player_id,session_id)
+    public BoolEvent(bool ev, string _name, int player_id, int session_id, Vector3? pos = null) :base(_name,player_id,session_id,pos)
     {
         data = ev;
     }
@@ -73,7 +78,7 @@ class BoolEvent : BaseEvent
 class IntEvent : BaseEvent
 {
     public int data;
-    public IntEvent(int ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
+    public IntEvent(int ev, string _name, int player_id, int session_id, Vector3? pos = null) : base(_name, player_id, session_id, pos)
     {
         data = ev;
     }
@@ -91,7 +96,7 @@ class IntEvent : BaseEvent
 class FloatEvent : BaseEvent
 {
     public float data;
-    public FloatEvent(float ev, string _name, int player_id, int session_id ) : base(_name, player_id, session_id)
+    public FloatEvent(float ev, string _name, int player_id, int session_id, Vector3? pos = null) : base(_name, player_id, session_id, pos)
     {
         data = ev;
     }
@@ -109,7 +114,7 @@ class FloatEvent : BaseEvent
 class CharEvent : BaseEvent
 {
     public char data;
-    public CharEvent(char ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
+    public CharEvent(char ev, string _name, int player_id, int session_id, Vector3? pos = null) : base(_name, player_id, session_id, pos)
     {
         data = ev;
     }
@@ -127,7 +132,7 @@ class StringEvent : BaseEvent
 {
     
     public string data;
-    public StringEvent(string ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
+    public StringEvent(string ev, string _name, int player_id, int session_id, Vector3? pos = null) : base(_name, player_id, session_id, pos)
     {
         data = ev;
     }
@@ -144,7 +149,7 @@ class StringEvent : BaseEvent
 public class Vector3Event :BaseEvent
 {
     public Vector3 data;
-    public Vector3Event(Vector3 ev, string _name, int player_id, int session_id) : base(_name, player_id, session_id)
+    public Vector3Event(Vector3 ev, string _name, int player_id, int session_id, Vector3? pos = null) :base(_name, player_id, session_id, pos)
     {
         data = ev;
     }

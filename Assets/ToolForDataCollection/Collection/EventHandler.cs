@@ -35,7 +35,6 @@ public class EventHandler : MonoBehaviour
         for (int i = 0; i < events.Count; i++)
         {
             events[i].ingame_events = new List<BaseEvent>();
-            Debug.Log("Hello??" + events[i].ingame_events.Count);
         }
     }
 
@@ -87,52 +86,79 @@ public class EventHandler : MonoBehaviour
         }
     }
 
-    static public void StoreEventStatic(string event_name, bool data) 
+    static public void StoreEventStatic(string event_name, bool data, Vector3? pos = null) 
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
         EventHandler tmp;
         if (tmp=  (EventHandler)FindObjectOfType(typeof(EventHandler)))
         {
-            tmp.StoreEvent(event_name, data);
+            if (pos == null)
+            {
+                tmp.StoreEvent(event_name, data);
+            }
+            else
+            {
+                tmp.StoreEvent(event_name, data, pos);
+            }
         }
         else
         {
             Debug.LogError("Trying to store an event without an EventHandler in the scene");
         }
     }
-    static public void StoreEventStatic(string event_name, int data)
+    static public void StoreEventStatic(string event_name, int data, Vector3? pos = null)
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
         EventHandler tmp;
         if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
         {
-            tmp.StoreEvent(event_name, data);
+            if (pos == null)
+            {
+                tmp.StoreEvent(event_name, data);
+            }
+            else
+            {
+                tmp.StoreEvent(event_name, data, pos);
+            }
         }
         else
         {
             Debug.LogError("Trying to store an event without an EventHandler in the scene");
         }
     }
-    static public void StoreEventStatic(string event_name, float data)
+    static public void StoreEventStatic(string event_name, float data, Vector3? pos = null)
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
         EventHandler tmp;
         if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
         {
-            tmp.StoreEvent(event_name, data);
+            if (pos == null)
+            {
+                tmp.StoreEvent(event_name, data);
+            }
+            else {
+                tmp.StoreEvent(event_name, data, pos);
+            }
         }
         else
         {
             Debug.LogError("Trying to store an event without an EventHandler in the scene");
         }
     }
-    static public void StoreEventStatic(string event_name, Vector3 data)
+    static public void StoreEventStatic(string event_name, Vector3 data, Vector3? pos = null)
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
         EventHandler tmp;
         if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
         {
-            tmp.StoreEvent(event_name, data);
+            if (pos == null)
+            {
+                tmp.StoreEvent(event_name, data);
+            }
+            else
+            {
+                tmp.StoreEvent(event_name, data, pos);
+            }
         }
         else
         {
@@ -140,7 +166,7 @@ public class EventHandler : MonoBehaviour
         }
     }
 
-    public void StoreEvent(string event_name, bool data)
+    public void StoreEvent(string event_name, bool data, Vector3? pos = null)
     {
         for(int i = 0;i<events.Count;i++)
         {
@@ -150,7 +176,7 @@ public class EventHandler : MonoBehaviour
             }
         }
     }
-    public void StoreEvent(string event_name, int data)
+    public void StoreEvent(string event_name, int data, Vector3? pos = null)
     {
         for (int i = 0; i < events.Count; i++)
         {
@@ -160,7 +186,7 @@ public class EventHandler : MonoBehaviour
             }
         }
     }
-    public void StoreEvent(string event_name, float data)
+    public void StoreEvent(string event_name, float data, Vector3? pos = null)
     {
         for (int i = 0; i < events.Count; i++)
         {
@@ -170,7 +196,7 @@ public class EventHandler : MonoBehaviour
             }
         }
     }
-    public void StoreEvent(string event_name, Vector3 data)
+    public void StoreEvent(string event_name, Vector3 data, Vector3? pos = null)
     {
         for (int i = 0; i < events.Count; i++)
         {
@@ -319,17 +345,6 @@ public class EventHandlerEditor : Editor
                 EditorGUILayout.EndFoldoutHeaderGroup();
                 handler.SaveEditorEvents();
             }
-
-            if (GUILayout.Button("TEST"))
-            {
-                StreamReader text = new StreamReader("Assets/Resources/SampleEvent.txt");
-                string sample = text.ReadToEnd();
-                File.WriteAllText("Assets/ToolForDataCollection/Utilities/SampleEvent.cs", sample);
-                AssetDatabase.Refresh();
-                Debug.Log(sample);
-                //path += "/Utilities/";
-                //Debug.Log(path);
-            }
         }
     }
 
@@ -363,6 +378,7 @@ public class StandardEvent
     public DataEventType type;
     public DataType data_type;
     public bool use_frequency;
+    public bool save_position;
     int playerID;
     int sessionID;
 
@@ -383,25 +399,27 @@ public class StandardEvent
       //  scene = SceneManager.GetActiveScene().name;
     }
 
-    public void StoreEvent(bool ev)
+    public void StoreEvent(bool ev, Vector3? pos = null)
     {
-        BoolEvent tmp = new BoolEvent(ev,name,playerID,sessionID);
+        BoolEvent tmp = new BoolEvent(ev,name,playerID,sessionID,pos);
         ingame_events.Add(tmp);
     }
-    public void StoreEvent(int ev)
+    public void StoreEvent(int ev, Vector3? pos = null)
     {
-        IntEvent tmp = new IntEvent(ev, name, playerID, sessionID);
+        IntEvent tmp = new IntEvent(ev, name, playerID, sessionID,pos);
         ingame_events.Add(tmp);
     }
-    public void StoreEvent(float ev)
+    public void StoreEvent(float ev, Vector3? pos = null)
     {
-        FloatEvent tmp = new FloatEvent(ev, name, playerID, sessionID);
+        FloatEvent tmp = new FloatEvent(ev, name, playerID, sessionID,pos);
         ingame_events.Add(tmp);
     }
-    public void StoreEvent(Vector3 ev)
+    public void StoreEvent(Vector3 ev, Vector3? pos = null)
     {
-        Vector3Event tmp = new Vector3Event(ev, name, playerID, sessionID);
+        Vector3Event tmp = new Vector3Event(ev, name, playerID, sessionID,pos);
+
         ingame_events.Add(tmp);
+
     }
 
     public string dataTypeToString()
