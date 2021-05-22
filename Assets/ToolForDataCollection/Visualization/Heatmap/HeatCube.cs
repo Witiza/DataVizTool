@@ -12,10 +12,11 @@ public class HeatCube
     public int max_events;
     float alpha = 0;
     HeatMapViewer parent;
+    public bool selected = false;
     
 
     Matrix4x4 transform;
-    Vector3 position;
+    public Vector3 position;
     Vector3 scale;
     Quaternion rotation;
 
@@ -47,6 +48,7 @@ public class HeatCube
 
     public void generateColor()
     {
+        alpha = events.Count / max_events;
         Color color = parent.gradient.Evaluate(alpha);
         mat.color = color;
     }
@@ -66,7 +68,7 @@ public class HeatCube
         {
             median_height += ev.position.y;
         }
-        median_height /= events.Count;
+        median_height /= events.Count+1; //Fuck u NaN
         position.y = median_height;
         transform.SetTRS(position, rotation, scale);
     }

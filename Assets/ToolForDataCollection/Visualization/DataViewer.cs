@@ -9,7 +9,8 @@ public class DataViewer : MonoBehaviour
     // Start is called before the first frame update
     public int lineCount = 100;
     public float radius = 3.0f;
-
+    Vector3 initial_pos;
+    Vector3 final_pos;
     Camera texture_camera;
     RenderTexture texture;
 
@@ -21,6 +22,7 @@ public class DataViewer : MonoBehaviour
         CreateLineMaterial();
         //texture = new RenderTexture((int)positio)
     }
+
     static void CreateLineMaterial()
     {
         if (!lineMaterial)
@@ -42,11 +44,15 @@ public class DataViewer : MonoBehaviour
         }
     }
 
-
+    public void setBoundingBox(Vector3 pos,Vector3 size)
+    {
+        initial_pos = pos;
+        final_pos = size;
+    }
     private void OnRenderObject()
     {
 
-        if (Camera.current == texture_camera)
+            if (Camera.current == texture_camera)
         { 
             CreateLineMaterial();
             lineMaterial.SetPass(0);
@@ -75,6 +81,11 @@ public class DataViewer : MonoBehaviour
     {
 
 
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawCube(initial_pos, final_pos);
     }
 }
 

@@ -6,6 +6,7 @@ using UnityEditor;
 public class HeatMapViewer : EditorWindow
 {
     [MenuItem("Window/Tool/DataViz/HeatMap")]
+
     static void Init()
     {
         HeatMapViewer window = (HeatMapViewer)EditorWindow.GetWindow(typeof(HeatMapViewer));
@@ -24,7 +25,7 @@ public class HeatMapViewer : EditorWindow
     int max_events = 0;
     HeatCube[,] heatmap;
     public List<EventContainer> events = new List<EventContainer>();
-
+    HeatSelection selection = new HeatSelection();
     public Gradient gradient = new Gradient();
 
     public void createHeatMap()
@@ -63,6 +64,7 @@ public class HeatMapViewer : EditorWindow
         adjoustmentsToCubes();
     }
 
+   
 
     public bool checkIfUsingEvent(string name)
     {
@@ -183,11 +185,47 @@ public class HeatMapViewer : EditorWindow
 
     }
 
-    void OnGUI()
+    private void Update()
+    {
+        selection.drawSelection();
+    }
+
+    private void OnEnable()
+    {
+        SceneView.duringSceneGui += OnSceneGUI;
+    }
+
+    private void OnDestroy()
+    {
+        SceneView.duringSceneGui -= OnSceneGUI;
+
+    }
+
+    void OnSceneGUI(SceneView sv)
     {
         //doing this in update causes extreme lag bruv
+        if (heatmap != null)
+            selection.SelectCubes(heatmap);
         RenderHeatMap();
-        if(!material)
+        if (selection != null)
+        {
+            selection.MouseCheck(sv);
+
+        }
+        else
+        {
+            selection = new HeatSelection();
+        }
+    }
+
+    void OnGUI()
+    {
+
+
+
+
+
+        if (!material)
         {
             GUI.enabled = false;
         }

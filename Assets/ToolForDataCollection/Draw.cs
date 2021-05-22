@@ -330,7 +330,7 @@ public static class Draw
     /// <summary>
     /// Draws a sphere in world space. Similar to Gizmos.DrawWireSphere, but with the ability to add radial and vertical segments
     /// </summary>
-    public static void Sphere(Vector3 center, float radius, int verticalSegments = 1, int radialSegments = 2)
+    public static void Sphere(Vector3 center, float radius, int verticalSegments = 10, int radialSegments = 20)
     {
         if (radialSegments > 2)
         {
