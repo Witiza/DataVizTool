@@ -49,6 +49,10 @@ public class HeatCube
     public void generateColor()
     {
         alpha = events.Count / max_events;
+        if(alpha != 0)
+        {
+            Debug.Log("Alpha: " + alpha);
+        }
         Color color = parent.gradient.Evaluate(alpha);
         mat.color = color;
     }

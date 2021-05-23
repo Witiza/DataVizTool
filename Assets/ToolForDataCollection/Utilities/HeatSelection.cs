@@ -7,15 +7,38 @@ using UnityEditor;
 public  class HeatSelection
 {
     bool selecting = false;
-    Vector3 initial_pos;
-    Vector3 final_pos;
+    Vector3 initial_pos = Vector3.one;
+    Vector3 final_pos = Vector3.zero;
     Mesh mesh;
-    int selected = 0;
 
     // Start is called before the first frame update
+    public void selectionByHandles()
+    {
+
+            initial_pos = Handles.PositionHandle(initial_pos, Quaternion.Inverse(Quaternion.identity));
+            final_pos = Handles.PositionHandle(final_pos, Quaternion.identity);
+        Vector3 tmp = initial_pos;
+        if(initial_pos.x > final_pos.x)
+        {
+            initial_pos.x = final_pos.x;
+            final_pos.x = tmp.x;
+        }
+        if (initial_pos.y > final_pos.y)
+        {
+            initial_pos.y = final_pos.y;
+            final_pos.y = tmp.y;
+        }
+        if (initial_pos.z > final_pos.z)
+        {
+            initial_pos.z = final_pos.z;
+            final_pos.z = tmp.z;
+        }
+
+        Object.FindObjectOfType<DataViewer>().GetComponent<DataViewer>().setBoundingBox(initial_pos,final_pos);
+    }
     public void MouseCheck(SceneView sv)
     {
-        GameObject.FindObjectOfType<DataViewer>().GetComponent<DataViewer>().setBoundingBox(initial_pos, (final_pos-initial_pos)/2);
+        GameObject.FindObjectOfType<DataViewer>().GetComponent<DataViewer>().setBoundingBox(initial_pos, final_pos-initial_pos);
         //button values are 0 for left button, 1 for right button, 2 for the middle button
         if ( Event.current.type == EventType.MouseDrag && Event.current.button == 1)
         {
@@ -54,30 +77,31 @@ public  class HeatSelection
 
     public void SelectCubes(HeatCube[,] heatmap)
     {
-        if(selecting)
-        {
 
-            float magnitude = ((final_pos - initial_pos) / 2).magnitude;
+
+        float magnitude = (final_pos - initial_pos).magnitude;
             if (magnitude > 1)
             {
-
-                Bounds square = new Bounds(initial_pos, (final_pos - initial_pos));
-                //BoundingSphere sphere = new BoundingSphere(initial_pos, (final_pos - initial_pos).magnitude / 2);
-                for (int i = 0; i < heatmap.GetLength(0); i++)
+            Vector3 center = (final_pos + initial_pos) / 2;
+            Bounds square = new Bounds(center, (final_pos - initial_pos));
+          //  BoundingSphere sphere = new BoundingSphere(initial_pos, (final_pos - initial_pos).magnitude / 2);
+            for (int i = 0; i < heatmap.GetLength(0); i++)
+            {
+                for (int j = 0; j < heatmap.GetLength(1); j++)
                 {
-                    for (int j = 0; j < heatmap.GetLength(1); j++)
+                    if (square.Contains(heatmap[i, j].position))
                     {
-                        if (square.Contains(heatmap[i, j].position))
-                        {
-                            if(heatmap[i,j].selected == false)
-                                selected++;
-                            heatmap[i, j].selected = true;
-                        }
+                        heatmap[i, j].selected = true;
+                    }
+                    else
+                    {
+                        heatmap[i, j].selected = false;
                     }
                 }
             }
         }
-        Debug.Log("GameObjects Selected: " + selected);
+        
+
     }
     public void drawSelection()
     {

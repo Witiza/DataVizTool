@@ -85,7 +85,11 @@ public class DataViewer : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawCube(initial_pos, final_pos);
+        Vector3 center = (final_pos + initial_pos) / 2;
+        if (center.magnitude > 0.1)
+        {
+            Gizmos.DrawCube(center, (final_pos-initial_pos));
+        }
     }
 }
 

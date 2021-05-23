@@ -15,7 +15,8 @@ public class HeatMapViewer : EditorWindow
 
     // Start is called before the first frame update
     public Material material;
-    public int cube_size = 1;
+    public float cube_size = 1f;
+    public bool selecting = false;
     float max_x = 0;
     float min_x = 0;
     float max_z = 0;
@@ -27,6 +28,7 @@ public class HeatMapViewer : EditorWindow
     public List<EventContainer> events = new List<EventContainer>();
     HeatSelection selection = new HeatSelection();
     public Gradient gradient = new Gradient();
+    int selected_amount = 0;
 
     public void createHeatMap()
     {
@@ -127,6 +129,7 @@ public class HeatMapViewer : EditorWindow
 
     void RenderHeatMap()
     {
+        selected_amount = 0;
         if (heatmap != null)
         {
             for (int i = 0; i < heatmap.GetLength(0); i++)
@@ -134,6 +137,10 @@ public class HeatMapViewer : EditorWindow
                 for (int j = 0; j < heatmap.GetLength(1); j++)
                 {
                     heatmap[i, j].RenderHeat();
+                    if(heatmap[i,j].selected)
+                    {
+                        selected_amount++;
+                    }
                 }
             }
         }
@@ -157,13 +164,22 @@ public class HeatMapViewer : EditorWindow
         {
             for (int j = 0; j < heatmap.GetLength(1); j++)
             {
+
                 int cube_events = heatmap[i, j].getEventAmount();
+
+                if (cube_events == 34)
+                {
+                    Debug.Log(" FOUND: ");
+                }
                 if (max_events < cube_events)
                 {
                     max_events = cube_events;
+
                 }
             }
         }
+
+        Debug.Log("MAX EVENTS ONLY"+max_events);
 
         for (int i = 0; i < heatmap.GetLength(0); i++)
         {
@@ -204,13 +220,14 @@ public class HeatMapViewer : EditorWindow
     void OnSceneGUI(SceneView sv)
     {
         //doing this in update causes extreme lag bruv
-        if (heatmap != null)
-            selection.SelectCubes(heatmap);
-        RenderHeatMap();
+        if (heatmap != null && selecting)
+           selection.SelectCubes(heatmap);
+
         if (selection != null)
         {
-            selection.MouseCheck(sv);
-
+            //  selection.MouseCheck(sv);
+            if(selecting)
+                selection.selectionByHandles();
         }
         else
         {
@@ -220,10 +237,7 @@ public class HeatMapViewer : EditorWindow
 
     void OnGUI()
     {
-
-
-
-
+        RenderHeatMap();
 
         if (!material)
         {
@@ -250,7 +264,22 @@ public class HeatMapViewer : EditorWindow
 
         material = (Material)EditorGUILayout.ObjectField("Material: ",material, typeof(Material), true);
 
+        if(selecting)
+        {
+            if (GUILayout.Button("Stop HeatMap selection"))
+            {
+                selecting = false;
+            }
+        }
+        else
+        {
+            if (GUILayout.Button("Select HeatMap area"))
+            {
+                selecting = true;
+            }
+        }
 
+        EditorGUILayout.LabelField("Selected Cubes: " + selected_amount);
         EditorGUILayout.LabelField("X cells: " + x_cells);
         EditorGUILayout.LabelField("Z cells: " + z_cells);
         EditorGUILayout.LabelField("Max events per cell: " + max_events);
