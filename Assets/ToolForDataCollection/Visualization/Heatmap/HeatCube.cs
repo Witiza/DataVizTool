@@ -6,11 +6,11 @@ using UnityEngine;
 public class HeatCube
 {
     public List<BaseEvent> events = new List<BaseEvent>();
-    Mesh mesh;
+
     public Material lineMaterial =null;
     Material mat;
     public int max_events;
-    float alpha = 0;
+    public float alpha = 0;
     HeatMapViewer parent;
     public bool selected = false;
     
@@ -27,7 +27,6 @@ public class HeatCube
         scale = _scale;
         parent = map;
         transform = Matrix4x4.TRS(position, Quaternion.identity, scale);
-        mesh = Shapes.GetUnityPrimitiveMesh(PrimitiveType.Cube);
         mat = new Material(material);
        
         //CreateLineMaterial();
@@ -48,7 +47,15 @@ public class HeatCube
 
     public void generateColor()
     {
-        alpha = events.Count /(float)max_events;
+        int count = 0;
+        foreach(BaseEvent ev in events)
+        {
+            if(parent.checkIfUsingEvent(ev.name))
+            {
+                count++;
+            }
+        }
+        alpha = count /(float)max_events;
         if(alpha != 0)
         {
             Debug.Log("Alpha: " + alpha);
@@ -57,7 +64,7 @@ public class HeatCube
         mat.color = color;
     }
   
-    public void RenderHeat()
+    public void RenderHeat(Mesh mesh)
     {
         if (mat.color.a > 0.0f)
         {

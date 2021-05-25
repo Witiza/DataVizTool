@@ -89,7 +89,7 @@ public  class HeatSelection
             {
                 for (int j = 0; j < heatmap.GetLength(1); j++)
                 {
-                    if (square.Contains(heatmap[i, j].position))
+                    if (square.Contains(heatmap[i, j].position)&&heatmap[i,j].alpha >0)
                     {
                         heatmap[i, j].selected = true;
                     }

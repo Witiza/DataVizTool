@@ -442,36 +442,6 @@ public class StandardEvent
         BaseEvent tmp = new BaseEvent(name, playerID, sessionID, pos);
         ingame_events.Add(tmp);
     }
-
-    public string dataTypeToString()
-    {
-        string ret="ERROR";
-        switch(data_type)
-        {
-            case DataType.NULL:
-                ret = "NULL";
-                break;
-            case DataType.BOOL:
-                ret = "BOOL";
-                break;
-            case DataType.INT:
-                ret = "INT";
-                break;
-            case DataType.FLOAT:
-                ret = "FLOAT";
-                break;
-            case DataType.CHAR:
-                ret = "CHAR";
-                break;
-            case DataType.STRING:
-                ret = "STRING";
-                break;
-            case DataType.VECTOR3:
-                ret = "VECTOR3";
-                break;
-        }
-        return ret;
-    }
     void generateID()
     {
         eventID = (uint)Random.Range(1, 999); //TEMPORARY

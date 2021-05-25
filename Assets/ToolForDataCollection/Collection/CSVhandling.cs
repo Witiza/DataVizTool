@@ -10,7 +10,7 @@ public static  class CSVhandling
     {
         string path = Application.persistentDataPath + "/events/";
         Directory.CreateDirectory(path);
-        path+=events.name+'-'+scene+'-'+events.dataTypeToString()+".csv";
+        path += events.name + '-' + scene + '-' + dataTypeToString(events.data_type) + ".csv";
         StreamWriter file;
         if(File.Exists(path))
         {
@@ -129,6 +129,36 @@ public static  class CSVhandling
         int end = line.IndexOf(',');
 
         events.use_position = bool.Parse(line.Substring(start, end - start));
+        return ret;
+    }
+
+    public static string dataTypeToString(DataType data_type)
+    {
+        string ret = "ERROR";
+        switch (data_type)
+        {
+            case DataType.NULL:
+                ret = "NULL";
+                break;
+            case DataType.BOOL:
+                ret = "BOOL";
+                break;
+            case DataType.INT:
+                ret = "INT";
+                break;
+            case DataType.FLOAT:
+                ret = "FLOAT";
+                break;
+            case DataType.CHAR:
+                ret = "CHAR";
+                break;
+            case DataType.STRING:
+                ret = "STRING";
+                break;
+            case DataType.VECTOR3:
+                ret = "VECTOR3";
+                break;
+        }
         return ret;
     }
 }
