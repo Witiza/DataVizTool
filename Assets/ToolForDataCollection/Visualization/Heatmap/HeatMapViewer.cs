@@ -167,9 +167,9 @@ public class HeatMapViewer : EditorWindow
 
                 int cube_events = heatmap[i, j].getEventAmount();
 
-                if (cube_events == 34)
+                if(cube_events >0)
                 {
-                    Debug.Log(" FOUND: ");
+                    Debug.Log("Events in Cube: "+cube_events);
                 }
                 if (max_events < cube_events)
                 {

@@ -13,13 +13,14 @@ public class DataViewer : MonoBehaviour
     Vector3 final_pos;
     Camera texture_camera;
     RenderTexture texture;
-
+    HeatMapViewer heatmap;
     static Material lineMaterial;
 
     void Start()
     {
         texture_camera = GetComponent<Camera>();
         CreateLineMaterial();
+        heatmap = EditorWindow.GetWindow<HeatMapViewer>();
         //texture = new RenderTexture((int)positio)
     }
 
@@ -85,10 +86,24 @@ public class DataViewer : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Vector3 center = (final_pos + initial_pos) / 2;
-        if (center.magnitude > 0.1)
+        if (heatmap != null)
         {
-            Gizmos.DrawCube(center, (final_pos-initial_pos));
+            if (heatmap.selecting)
+            {
+                Vector3 center = (final_pos + initial_pos) / 2;
+                if (center.magnitude > 0.1)
+                {
+                    Gizmos.DrawCube(center, (final_pos - initial_pos));
+                }
+            }
+        }
+        else
+        {
+            //We dont want to open a new one always, we just want to get the reference if the window is open
+           if(EditorWindow.HasOpenInstances<HeatMapViewer>())
+            {
+                heatmap=EditorWindow.GetWindow<HeatMapViewer>();
+            }
         }
     }
 }

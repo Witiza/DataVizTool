@@ -48,7 +48,7 @@ public class HeatCube
 
     public void generateColor()
     {
-        alpha = events.Count / max_events;
+        alpha = events.Count /(float)max_events;
         if(alpha != 0)
         {
             Debug.Log("Alpha: " + alpha);
