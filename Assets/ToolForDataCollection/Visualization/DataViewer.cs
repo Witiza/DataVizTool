@@ -70,13 +70,6 @@ public class DataViewer : MonoBehaviour
             
         }
     }
-    public void OnPostRender()
-    {
-        //if (Camera.current == camera)
-        //{
-        //    GL.Clear(true, true, Color.green);
-        //}
-    }
 
     void OnDestroy()
     {
@@ -108,10 +101,3 @@ public class DataViewer : MonoBehaviour
     }
 }
 
-
-
-[CustomEditor(typeof(DataViewer))]
-public class DataViewerEditor : Editor
-{
-    
-}

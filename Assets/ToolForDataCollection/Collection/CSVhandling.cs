@@ -116,6 +116,7 @@ public static  class CSVhandling
         else
         {
             Debug.Log("Unable to open: "+path);
+            ret.empty = true;
         }
         return ret;
     }

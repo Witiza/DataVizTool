@@ -15,6 +15,7 @@ public class EventContainer
     public DataType type;
     public List<BaseEvent> events;
     public bool use_position;
+    public bool empty = false;
 }
 public class BaseEvent
 {

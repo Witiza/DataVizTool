@@ -210,7 +210,7 @@ public class HeatMapViewer : EditorWindow
     {
         foreach (EventContainer ev in events)
         {
-            if (ev.use_position)
+            if (ev.use_position&&!ev.empty)
             {
                 assignEvent(ev);
             }
@@ -386,12 +386,19 @@ public class HeatMapViewer : EditorWindow
         }
         foreach (EventContainer ev in events)
         {
-            EditorGUI.BeginChangeCheck();
-            ev.in_use = EditorGUILayout.Toggle("View " + ev.name, ev.in_use);
-            if (EditorGUI.EndChangeCheck())
+            if (!ev.empty)
             {
-                if (heatmap != null)
-                    adjoustmentsToCubes();
+                EditorGUI.BeginChangeCheck();
+                ev.in_use = EditorGUILayout.Toggle("View " + ev.name, ev.in_use);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    if (heatmap != null)
+                        adjoustmentsToCubes();
+                }
+            }
+            else
+            {
+                EditorGUILayout.LabelField("There is no CSV file for " + ev.name);
             }
         }
     }
