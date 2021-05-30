@@ -93,13 +93,11 @@ public class EventHandler : MonoBehaviour
     static public void StoreEventStatic(string event_name, bool data, Vector3? pos = null,GameObject target = null) 
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
+
         EventHandler tmp;
         if (tmp=  (EventHandler)FindObjectOfType(typeof(EventHandler)))
         {
-
                tmp.StoreEvent(event_name, data,pos,target);
-
-
         }
         else
         {
@@ -404,6 +402,7 @@ public class StandardEvent
 
     public void StoreEvent(bool ev, Vector3? pos = null, GameObject target = null)
     {
+
         BoolEvent tmp = new BoolEvent(ev,name,playerID,sessionID,pos,target);
         ingame_events.Add(tmp);
     }

@@ -12,13 +12,13 @@ public class EventTracker : MonoBehaviour
     //https://docs.unity3d.com/ScriptReference/Transform.SetSiblingIndex.html
     //https://stackoverflow.com/questions/63482810/detect-hierarchy-change-during-runtime
 
-    string UID = "";
+    public string GUID = "";
     public List<BaseEvent> events = new List<BaseEvent>();
 
     void Start()
     {
         generateUID();
-        Debug.Log("UID: " + UID);
+        Debug.Log("UID: " + GUID);
     }
 
     // Update is called once per frame
@@ -30,7 +30,7 @@ public class EventTracker : MonoBehaviour
     void generateUID()
     {
         recursiveParent(transform);
-        UID += transform.GetSiblingIndex();
+        GUID += transform.GetSiblingIndex();
     }
     
     void recursiveParent(Transform trns)
@@ -38,7 +38,7 @@ public class EventTracker : MonoBehaviour
         if(trns.parent != trns.root)
         {
             recursiveParent(trns.parent);
-            UID += trns.parent.GetSiblingIndex() + ",";
+            GUID += trns.parent.GetSiblingIndex() + "-";
         }
       
     }

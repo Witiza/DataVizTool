@@ -178,8 +178,6 @@ public static  class CSVhandling
         int index;
         bool found = int.TryParse(GUID.Substring(start, end - start),out index);
         GameObject tmp = SceneManager.GetActiveScene().GetRootGameObjects()[index];
-        Debug.Log("GO NAME: " + tmp.name);
-        Debug.Log("Index: " + index);
 
         for (int i = 1; i < depth;i++)
         {
@@ -187,8 +185,6 @@ public static  class CSVhandling
             end = GUID.IndexOf('-', start);
              found = int.TryParse(GUID.Substring(start, end - start), out index);
                 tmp = tmp.transform.GetChild(index).gameObject;
-                Debug.Log("GO NAME: " + tmp.name);
-                Debug.Log("Index: " + index);
         }
 
         return tmp;

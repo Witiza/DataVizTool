@@ -24,18 +24,31 @@ public class BaseEvent
     int playerID;
     int sessionID;
     string timestamp;
+    bool use_pos=false; //corner cases amirigth
     public Vector3 position;
-    GameObject target;
+    GameObject fuckthis;
+    string target_GUID = "";
 
-    public BaseEvent(string _name,int player_id, int session_id, Vector3? pos = null, GameObject target = null)
+    public BaseEvent(string _name,int player_id, int session_id, Vector3? pos, GameObject _target)
     {
         name = _name;
         playerID = player_id;
         sessionID = session_id;
         timestamp = System.DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss.fff");
-        if(pos != null)
+        if (pos != null)
         {
-            position = pos.GetValueOrDefault();
+            position = pos.Value;
+            use_pos = true;
+        }
+
+        EventTracker tmp = _target.GetComponent<EventTracker>();
+        if (tmp != null)
+        {
+            target_GUID = tmp.GUID;
+        }
+        else
+        {
+            Debug.LogWarning("Trying to add GameObject " + _target + " without and EventTracker component");
         }
     }
 
@@ -56,6 +69,7 @@ public class BaseEvent
 
         if (use_position)
         {
+            use_pos = true;
             start = end + 1;
             end = line.IndexOf(',', start);
             position.x = float.Parse(line.Substring(start, end - start));
@@ -73,20 +87,32 @@ public class BaseEvent
 
             start = end + 1;
             end = line.IndexOf(',', start);
-            string target = line.Substring(start, end - start);
+            string s_target = line.Substring(start, end - start);
+            Debug.Log("BRUUUV"+fuckthis);
+            fuckthis = CSVhandling.getGameObject(s_target);
         }
     }
 
     public virtual void saveToCSV(StreamWriter file)
     {
-        file.Write(playerID + "," + sessionID + "," + timestamp + ","+position.x+","+position.y+","+position.z+","+GUID); //needs to have a gameobject to guid funciton (using the event tracker duuh)
+        file.Write(playerID + "," + sessionID + "," + timestamp + ",");
+        if (use_pos)
+        {
+            file.Write(position.x+ "," + position.y + "," + position.z + ",");
+        }
+        Debug.Log(target_GUID);
+        Debug.Log(name);
+        if(target_GUID != "")
+        {
+                file.Write(target_GUID + ",");
+        }
     }
 };
 
 class BoolEvent : BaseEvent
 {
     public bool data;
-    public BoolEvent(bool ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) :base(_name,player_id,session_id,pos,target)
+    public BoolEvent(bool ev, string _name, int player_id, int session_id, Vector3? pos, GameObject target) :base(_name,player_id,session_id,pos,target)
     {
         data = ev;
     }
