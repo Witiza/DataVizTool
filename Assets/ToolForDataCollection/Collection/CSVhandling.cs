@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 
 public static  class CSVhandling 
@@ -20,15 +21,17 @@ public static  class CSVhandling
         {
             file = new StreamWriter(path,false);
             //First column in metadata indicates if the event uses position;
+            file.WriteLine(events.save_position + ","+events.use_target);
+            file.Write("PlayerID, SessionID, Timestamp,");
             if (events.save_position)
             {
-                file.WriteLine("true,");
-                file.WriteLine("PlayerID,SessionID,Timestamp,X,Y,Z,Data");
+                file.Write("X,Y,Z,");
             }
-            else {
-                file.WriteLine("false,");
-                file.WriteLine("PlayerID,SessionID,Timestamp,Data");
+            else if(events.use_target)
+            { 
+                file.WriteLine("TargetGUID,");
             }
+            file.WriteLine();
         }
 
        
@@ -65,49 +68,49 @@ public static  class CSVhandling
                     ret.type = DataType.NULL;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new BaseEvent(line, name, ret.use_position));
+                        ret.events.Add(new BaseEvent(line, name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "BOOL":
                     ret.type = DataType.BOOL;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new BoolEvent(line,name,ret.use_position));
+                        ret.events.Add(new BoolEvent(line,name,ret.use_position,ret.use_target));
                      }
                     break;
                 case "INT":
                     ret.type = DataType.INT;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new IntEvent(line,name, ret.use_position));
+                        ret.events.Add(new IntEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "FLOAT":
                     ret.type = DataType.FLOAT;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new FloatEvent(line,name, ret.use_position));
+                        ret.events.Add(new FloatEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "CHAR":
                     ret.type = DataType.CHAR;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new CharEvent(line,name, ret.use_position));
+                        ret.events.Add(new CharEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "STRING":
                     ret.type = DataType.STRING;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new StringEvent(line,name, ret.use_position));
+                        ret.events.Add(new StringEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "VECTOR3":
                     ret.type = DataType.VECTOR3;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new Vector3Event(line,name, ret.use_position));
+                        ret.events.Add(new Vector3Event(line,name, ret.use_position, ret.use_target ));
                     }
                     break;
             }
@@ -129,7 +132,11 @@ public static  class CSVhandling
         int start = 0;
         int end = line.IndexOf(',');
 
-        events.use_position = bool.Parse(line.Substring(start, end - start));
+        ret.use_position = bool.Parse(line.Substring(start, end - start));
+
+        start = end + 1;
+         end = line.IndexOf(',', start);
+        ret.use_target = bool.Parse(line.Substring(start, end - start));
         return ret;
     }
 
@@ -161,5 +168,29 @@ public static  class CSVhandling
                 break;
         }
         return ret;
+    }
+
+    public static GameObject getGameObject(string GUID)
+    {
+        int depth = GUID.Split('-').Length-1;
+        int start = 0;
+        int end = GUID.IndexOf('-');
+        int index;
+        bool found = int.TryParse(GUID.Substring(start, end - start),out index);
+        GameObject tmp = SceneManager.GetActiveScene().GetRootGameObjects()[index];
+        Debug.Log("GO NAME: " + tmp.name);
+        Debug.Log("Index: " + index);
+
+        for (int i = 1; i < depth;i++)
+        {
+            start = end + 1;
+            end = GUID.IndexOf('-', start);
+             found = int.TryParse(GUID.Substring(start, end - start), out index);
+                tmp = tmp.transform.GetChild(index).gameObject;
+                Debug.Log("GO NAME: " + tmp.name);
+                Debug.Log("Index: " + index);
+        }
+
+        return tmp;
     }
 }

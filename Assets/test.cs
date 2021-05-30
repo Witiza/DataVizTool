@@ -20,14 +20,13 @@ public class test : MonoBehaviour
 
         string data_type = path.Substring(path.LastIndexOf("-")+1, path.LastIndexOf(".") - path.LastIndexOf("-")-1);
 
-        //StandardEvent events = CSVhandling.LoadCSV();
+        Debug.Log("Sibling "+transform.GetSiblingIndex());
 
+        string tst ="0-2-3-";
 
+        Debug.Log(CSVhandling.getGameObject(tst).name);
 
-
-        //Debug.Log(events.ingame_events.Count);
-
-       
+        EventHandler.StoreEventStatic("Attack",true, null, gameObject);
     }
 
     // Update is called once per frame

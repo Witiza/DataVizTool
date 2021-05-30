@@ -15,6 +15,7 @@ public class EventContainer
     public DataType type;
     public List<BaseEvent> events;
     public bool use_position;
+    public bool use_target;
     public bool empty = false;
 }
 public class BaseEvent
@@ -24,8 +25,9 @@ public class BaseEvent
     int sessionID;
     string timestamp;
     public Vector3 position;
+    GameObject target;
 
-    public BaseEvent(string _name,int player_id, int session_id, Vector3? pos = null)
+    public BaseEvent(string _name,int player_id, int session_id, Vector3? pos = null, GameObject target = null)
     {
         name = _name;
         playerID = player_id;
@@ -37,7 +39,7 @@ public class BaseEvent
         }
     }
 
-    public BaseEvent(string line, string _name, bool use_position)
+    public BaseEvent(string line, string _name, bool use_position, bool use_target)
     {
         name = _name;
         int start = 0;
@@ -66,23 +68,30 @@ public class BaseEvent
             end = line.IndexOf(',', start);
             position.z = float.Parse(line.Substring(start, end - start));
         }
+        if(use_target)
+        {
+
+            start = end + 1;
+            end = line.IndexOf(',', start);
+            string target = line.Substring(start, end - start);
+        }
     }
 
     public virtual void saveToCSV(StreamWriter file)
     {
-        file.Write(playerID + "," + sessionID + "," + timestamp + ","+position.x+","+position.y+","+position.z+",");
+        file.Write(playerID + "," + sessionID + "," + timestamp + ","+position.x+","+position.y+","+position.z+","+GUID); //needs to have a gameobject to guid funciton (using the event tracker duuh)
     }
 };
 
 class BoolEvent : BaseEvent
 {
     public bool data;
-    public BoolEvent(bool ev, string _name, int player_id, int session_id, Vector3? pos = null) :base(_name,player_id,session_id,pos)
+    public BoolEvent(bool ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) :base(_name,player_id,session_id,pos,target)
     {
         data = ev;
     }
 
-    public BoolEvent(string line, string _name,bool use_position):base(line,_name,  use_position)
+    public BoolEvent(string line, string _name,bool use_position, bool use_target) :base(line,_name,  use_position, use_target)
     {
         data = bool.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -96,11 +105,11 @@ class BoolEvent : BaseEvent
 class IntEvent : BaseEvent
 {
     public int data;
-    public IntEvent(int ev, string _name, int player_id, int session_id, Vector3? pos = null) : base(_name, player_id, session_id, pos)
+    public IntEvent(int ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
     {
         data = ev;
     }
-    public IntEvent(string line, string _name, bool use_position) : base(line, _name, use_position)
+    public IntEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
     {
         data = int.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -114,11 +123,11 @@ class IntEvent : BaseEvent
 class FloatEvent : BaseEvent
 {
     public float data;
-    public FloatEvent(float ev, string _name, int player_id, int session_id, Vector3? pos = null) : base(_name, player_id, session_id, pos)
+    public FloatEvent(float ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos,target)
     {
         data = ev;
     }
-    public FloatEvent(string line, string _name, bool use_position) : base(line, _name, use_position)
+    public FloatEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
     {
         data = float.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -132,11 +141,11 @@ class FloatEvent : BaseEvent
 class CharEvent : BaseEvent
 {
     public char data;
-    public CharEvent(char ev, string _name, int player_id, int session_id, Vector3? pos = null) : base(_name, player_id, session_id, pos)
+    public CharEvent(char ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
     {
         data = ev;
     }
-    public CharEvent(string line, string _name, bool use_position) : base(line, _name, use_position)
+    public CharEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
     {
         data = char.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -150,11 +159,11 @@ class StringEvent : BaseEvent
 {
     
     public string data;
-    public StringEvent(string ev, string _name, int player_id, int session_id, Vector3? pos = null) : base(_name, player_id, session_id, pos)
+    public StringEvent(string ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos,target)
     {
         data = ev;
     }
-    public StringEvent(string line, string _name, bool use_position) : base(line, _name, use_position)
+    public StringEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
     {
         data = line.Substring(line.LastIndexOf(',') + 1);
     }
@@ -167,12 +176,12 @@ class StringEvent : BaseEvent
 public class Vector3Event : BaseEvent
 {
     public Vector3 data;
-    public Vector3Event(Vector3 ev, string _name, int player_id, int session_id, Vector3? pos = null) : base(_name, player_id, session_id, pos)
+    public Vector3Event(Vector3 ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
     {
         data = ev;
     }
 
-    public Vector3Event(string line, string _name, bool use_position) : base(line, _name, use_position)
+    public Vector3Event(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
     {
 
         data = new Vector3();
