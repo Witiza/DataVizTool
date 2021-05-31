@@ -2,18 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class test : MonoBehaviour
+public class SceneDataViewer : MonoBehaviour
 {
     // Start is called before the first frame update
-    string name;
-    int playerID;
-    int sessionID;
-    string timestamp;
-    int value;
-    Vector3 data;
     void Start()
     {
-        EventHandler.StoreEventStatic("Attack",true, gameObject.transform.position, gameObject);
+        
     }
 
     // Update is called once per frame

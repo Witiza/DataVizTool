@@ -42,9 +42,12 @@ public class BaseEvent
         }
 
         EventTracker tmp = _target.GetComponent<EventTracker>();
+        Debug.Log(tmp.gameObject.name);
         if (tmp != null)
         {
-            target_GUID = tmp.GUID;
+            Debug.Log("tracker exists");
+            target_GUID = tmp.getGUID();
+            //Debug.Log("GUID: " + tmp.GUID);
         }
         else
         {

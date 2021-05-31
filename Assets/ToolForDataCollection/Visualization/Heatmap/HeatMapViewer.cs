@@ -80,14 +80,6 @@ public class HeatMapViewer : EditorWindow
         max_z = 0;
         min_z = 0;
         max_events = 0;
-       // events.Clear();
-        //if (events.Count == 0)
-        //{
-        //    //events.Add(CSVhandling.LoadCSV("Position", "TestScene", "VECTOR3"));
-        //    //events.Add(CSVhandling.LoadCSV("Position2", "TestScene", "VECTOR3"));
-        //    events.Add(CSVhandling.LoadCSV("Position", "ExampleScene", "NULL"));
-
-        //}
         calculateSize();
 
 
@@ -381,8 +373,11 @@ public class HeatMapViewer : EditorWindow
                         events.Add(CSVhandling.LoadCSV(st_ev.name, SceneManager.GetActiveScene().name,CSVhandling.dataTypeToString(st_ev.data_type)));
                     }
                 }
-
             }
+        }
+        else
+        {
+            Debug.LogError("No EventHandler in the Scene");
         }
         foreach (EventContainer ev in events)
         {
