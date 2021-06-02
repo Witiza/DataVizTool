@@ -10,7 +10,7 @@ public enum HeatCubeShape
     SPHERE
 };
 
-public class HeatMapViewer : EditorWindow
+public class HeatMapViewer : DataViewer
 {
     //This two go together
     [MenuItem("Window/Tool/DataViz/HeatMap")]
@@ -32,36 +32,23 @@ public class HeatMapViewer : EditorWindow
     float min_z = 0;
     int x_cells;
     int z_cells;
-    int max_events = 0;
     HeatCube[,] heatmap;
-    public List<EventContainer> events = new List<EventContainer>();
     HeatSelection selection = new HeatSelection();
-    public Gradient gradient = new Gradient();
     int selected_amount = 0;
-    EventHandler event_handler = null;
+
     Mesh cube = null;
     Mesh sphere = null;
     HeatCubeShape shape;
 
 
-    GUIStyle title = new GUIStyle();
 
-    GUIStyle text = new GUIStyle();
     void Awake()
     {
-        if(!(event_handler = GameObject.FindObjectOfType<EventHandler>()))
-        {
-            Debug.LogError("There is no EventHandler component in the scene");
-        }
+        getEventHandler();
         loadMeshes();
     }
 
-    void setStyles()
-    {
-        title.fontSize = 20;
-        title.normal.textColor = Color.white;
-        title.alignment = TextAnchor.MiddleCenter;
-    }
+
 
     void loadMeshes()
     {
@@ -276,7 +263,6 @@ public class HeatMapViewer : EditorWindow
 
         if (selection != null)
         {
-            //  selection.MouseCheck(sv);
             if(selecting)
                 selection.selectionByHandles();
         }
@@ -288,12 +274,10 @@ public class HeatMapViewer : EditorWindow
 
     void OnGUI()
     {
-
         setStyles();
-        
         RenderHeatMap();
        
-        GUILayout.Label("HeatMap",title);
+        GUILayout.Label("HeatMap",inspector_title);
         if (!material)
         {
             GUI.enabled = false;
@@ -352,17 +336,14 @@ public class HeatMapViewer : EditorWindow
             //SceneView.currentDrawingSceneView.Repaint();
             view.Repaint();
         }
-
         shape = (HeatCubeShape)EditorGUILayout.EnumPopup("Heat Cubes Shape: ", shape);
-
-
 
         EditorGUILayout.LabelField("Selected Cubes: " + selected_amount);
         EditorGUILayout.LabelField("X cells: " + x_cells);
         EditorGUILayout.LabelField("Z cells: " + z_cells);
         EditorGUILayout.LabelField("Max events per cell: " + max_events);
 
-        if(event_handler)
+        if(getEventHandler())
         {
             foreach(StandardEvent st_ev in event_handler.events)
             {

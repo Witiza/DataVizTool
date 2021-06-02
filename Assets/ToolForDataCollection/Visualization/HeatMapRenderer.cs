@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 [ExecuteInEditMode]
-public class DataViewer : MonoBehaviour
+public class HeatMapRenderer : MonoBehaviour
 {
     // Start is called before the first frame update
     public int lineCount = 100;

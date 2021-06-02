@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class EventTracker : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -23,7 +24,11 @@ public class EventTracker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Debug.Log("HENLO");
+        if(events.Count > 0)
+        {
+            Debug.Log("Events: " + events.Count);
+        }
     }
 
     public string getGUID()
@@ -48,6 +53,11 @@ public class EventTracker : MonoBehaviour
             GUID += trns.GetSiblingIndex() + "-";
         }
       
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawCube(gameObject.transform.position, new Vector3(10 * events.Count, 10 * events.Count, 10 * events.Count));
     }
 
 }

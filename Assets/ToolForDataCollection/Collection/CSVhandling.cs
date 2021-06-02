@@ -21,7 +21,7 @@ public static  class CSVhandling
         {
             file = new StreamWriter(path,false);
             //First column in metadata indicates if the event uses position;
-            file.WriteLine(events.save_position + ","+events.use_target);
+            file.WriteLine(events.save_position + ","+events.use_target+",");
             file.Write("PlayerID, SessionID, Timestamp,");
             if (events.save_position)
             {
@@ -131,7 +131,6 @@ public static  class CSVhandling
 
         int start = 0;
         int end = line.IndexOf(',');
-
         ret.use_position = bool.Parse(line.Substring(start, end - start));
 
         start = end + 1;

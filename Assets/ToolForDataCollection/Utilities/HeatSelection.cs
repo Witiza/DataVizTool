@@ -34,11 +34,11 @@ public  class HeatSelection
             final_pos.z = tmp.z;
         }
 
-        Object.FindObjectOfType<DataViewer>().GetComponent<DataViewer>().setBoundingBox(initial_pos,final_pos);
+        Object.FindObjectOfType<HeatMapRenderer>().GetComponent<HeatMapRenderer>().setBoundingBox(initial_pos,final_pos);
     }
     public void MouseCheck(SceneView sv)
     {
-        GameObject.FindObjectOfType<DataViewer>().GetComponent<DataViewer>().setBoundingBox(initial_pos, final_pos-initial_pos);
+        GameObject.FindObjectOfType<HeatMapRenderer>().GetComponent<HeatMapRenderer>().setBoundingBox(initial_pos, final_pos-initial_pos);
         //button values are 0 for left button, 1 for right button, 2 for the middle button
         if ( Event.current.type == EventType.MouseDrag && Event.current.button == 1)
         {

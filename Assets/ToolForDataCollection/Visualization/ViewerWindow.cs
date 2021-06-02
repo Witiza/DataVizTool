@@ -8,7 +8,7 @@ public class ViewerWindow : EditorWindow
 {
     Camera camera = null;
     RenderTexture texture;
-    DataViewer script = null;
+    HeatMapRenderer script = null;
 
     [MenuItem("Window/Tool/DataViz/ViewerWindow")]
     public static void ShowWindow()
@@ -32,7 +32,7 @@ public class ViewerWindow : EditorWindow
     }
     public void OnEnable()
     {
-        if (!(script = FindObjectOfType<DataViewer>()))
+        if (!(script = FindObjectOfType<HeatMapRenderer>()))
         {
             Debug.LogError("DataViewer component not found in the scene");
         }

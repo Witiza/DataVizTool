@@ -26,8 +26,8 @@ public class BaseEvent
     string timestamp;
     bool use_pos=false; //corner cases amirigth
     public Vector3 position;
-    GameObject fuckthis;
-    string target_GUID = "";
+    public GameObject target_go;
+    public string target_GUID = "";
 
     public BaseEvent(string _name,int player_id, int session_id, Vector3? pos, GameObject _target)
     {
@@ -90,9 +90,8 @@ public class BaseEvent
 
             start = end + 1;
             end = line.IndexOf(',', start);
-            string s_target = line.Substring(start, end - start);
-            Debug.Log("BRUUUV"+fuckthis);
-            fuckthis = CSVhandling.getGameObject(s_target);
+            target_GUID = line.Substring(start, end - start);
+            target_go = CSVhandling.getGameObject(target_GUID);
         }
     }
 

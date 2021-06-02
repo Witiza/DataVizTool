@@ -30,6 +30,7 @@ public class EventHandler : MonoBehaviour
 {
     public List<StandardEvent> events = new List<StandardEvent>();
 
+
     void OnEnable()
     {
         LoadEditorEvents();
