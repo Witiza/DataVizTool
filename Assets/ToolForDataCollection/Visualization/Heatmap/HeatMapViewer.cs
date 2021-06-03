@@ -93,21 +93,7 @@ public class HeatMapViewer : DataViewer
 
    
 
-    public bool checkIfUsingEvent(string name)
-    {
-
-        foreach (EventContainer tmp in events)
-        {
-            if (tmp.name == name)
-            {
-                if (tmp.in_use)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+   
     public void adjoustmentsToCubes()
     {
         for (int i = 0; i < heatmap.GetLength(0); i++)

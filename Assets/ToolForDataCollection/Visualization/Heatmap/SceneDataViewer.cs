@@ -18,7 +18,12 @@ public class SceneDataViewer : DataViewer
     List<EventTracker> trackers = new List<EventTracker>();
 
 
-
+    void generateSceneView()
+    {
+        assignEvents();
+        generateMaxEvents();
+        generateColors();
+    }
     void Awake()
     {
         getEventHandler();
@@ -43,7 +48,6 @@ public class SceneDataViewer : DataViewer
                     {
                         if(ev.target_go == tracker.gameObject) //there must be a better way to do this for sue
                         {
-                            Debug.Log("YABBA DABBA DOOOOH");
                             tracker.events.Add(ev);
                         }
                     }
@@ -52,15 +56,40 @@ public class SceneDataViewer : DataViewer
         }
     }
 
+    void generateMaxEvents()
+    {
+        foreach(EventTracker tracker in trackers)
+        {
+            if(tracker.events.Count > max_events)
+            {
+                max_events = tracker.events.Count;
+            }
+        }
+    }
+
+
+    void generateColors()
+    {
+        foreach (EventTracker tracker in trackers)
+        {
+            tracker.generateColor();
+        }
+    }
     private void OnGUI()
     {
         setStyles();
         GUILayout.Label("SceneViewer", inspector_title);
 
-        if(GUILayout.Button("Distribute Events"))
+        gradient = EditorGUILayout.GradientField("Color: ", gradient);
+
+        DrawUILine(Color.white,5,20);
+
+        if (GUILayout.Button("Distribute Events"))
         {
             assignEvents();
         }
+
+        DrawUILine(Color.white,5,20);
 
         if (getEventHandler())
         {
@@ -83,7 +112,6 @@ public class SceneDataViewer : DataViewer
         {
             if (!ev.empty)
             {
-                EditorGUI.BeginChangeCheck();
                 ev.in_use = EditorGUILayout.Toggle("View " + ev.name, ev.in_use);
                 if (EditorGUI.EndChangeCheck())
                 {

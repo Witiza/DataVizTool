@@ -32,4 +32,30 @@ public class DataViewer : EditorWindow
         inspector_title.normal.textColor = Color.white;
         inspector_title.alignment = TextAnchor.MiddleCenter;
     }
+
+    public bool checkIfUsingEvent(string name)
+    {
+
+        foreach (EventContainer tmp in events)
+        {
+            if (tmp.name == name)
+            {
+                if (tmp.in_use)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void DrawUILine(Color color, int thickness = 2, int padding = 10)
+    {
+        Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
+        r.height = thickness;
+        r.y += padding / 2;
+        r.x -= 2;
+        r.width += 6;
+        EditorGUI.DrawRect(r, color);
+    }
 }
