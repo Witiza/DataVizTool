@@ -13,6 +13,8 @@ public class HeatCube
     public float alpha = 0;
     HeatMapViewer parent;
     public bool selected = false;
+
+    int events_in_use = 0;
     
 
     Matrix4x4 transform;
@@ -47,26 +49,20 @@ public class HeatCube
 
     public void generateColor()
     {
-        int count = 0;
-        foreach(BaseEvent ev in events)
-        {
-            if(parent.checkIfUsingEvent(ev.name))
-            {
-                count++;
-            }
-        }
-        alpha = count /(float)max_events;
+      
+        alpha = events_in_use / (float)max_events;
         if(alpha != 0)
         {
             Debug.Log("Alpha: " + alpha);
         }
         Color color = parent.gradient.Evaluate(alpha);
+      //  color.a = alpha;
         mat.color = color;
     }
   
     public void RenderHeat(Mesh mesh)
     {
-        if (mat.color.a > 0.0f)
+        if (alpha>0)
         {
             Graphics.DrawMesh(mesh, transform, mat, 0); //LAYER AS AN OPTION
         }
@@ -81,6 +77,30 @@ public class HeatCube
         }
         median_height /= events.Count+1; //Fuck u NaN
         position.y = median_height;
+    }
+
+    public void generateEventsInUse()
+    {
+        events_in_use = 0;
+        foreach (BaseEvent ev in events)
+        {
+            if (parent.checkIfUsingEvent(ev.name))
+            {
+                events_in_use++;
+            }
+        }
+    }
+    public void generateSize()
+    {
+        scale = new Vector3(parent.cube_size, parent.cube_size, parent.cube_size);
+        if (parent.modify_size)
+        {
+            scale *= parent.size_multiplier * events_in_use;
+        }
+    }
+
+    public void generateTransform()
+    {
         transform.SetTRS(position, rotation, scale);
     }
 

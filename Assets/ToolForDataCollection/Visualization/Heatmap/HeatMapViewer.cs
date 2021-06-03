@@ -21,7 +21,9 @@ public class HeatMapViewer : DataViewer
 
     }
 
+    int lastRenderedFrame = 0;
     // Start is called before the first frame update
+    bool dirty;
     public Material material;
     public float cube_size = 1f;
     public bool selecting = false;
@@ -33,7 +35,8 @@ public class HeatMapViewer : DataViewer
     int x_cells;
     int z_cells;
     HeatCube[,] heatmap;
-    HeatSelection selection = new HeatSelection();
+    HeatSelection selection;
+    public HeatMapRenderer renderer;
     int selected_amount = 0;
 
     Mesh cube = null;
@@ -44,11 +47,24 @@ public class HeatMapViewer : DataViewer
 
     void Awake()
     {
+        getRenderer();
         getEventHandler();
         loadMeshes();
+      
+        selection = new HeatSelection(this);
     }
 
-
+   public  void getRenderer()
+    {
+        if ((renderer = GameObject.FindObjectOfType<HeatMapRenderer>()))
+        {
+            renderer.heatmap = this;
+        }
+        else
+        {
+            Debug.LogError("There is not a HeatMapRenderer Component in the scene");
+        }
+    }
 
     void loadMeshes()
     {
@@ -59,6 +75,7 @@ public class HeatMapViewer : DataViewer
     }
     public void createHeatMap()
     {
+        dirty = false;
         heatmap = null;
         x_cells = 0;
         z_cells = 0;
@@ -100,8 +117,11 @@ public class HeatMapViewer : DataViewer
         {
             for (int j = 0; j < heatmap.GetLength(1); j++)
             {
+                heatmap[i, j].generateEventsInUse();
+                heatmap[i, j].generateSize();
                 heatmap[i, j].generateColor();
                 heatmap[i, j].generateHeight();
+                heatmap[i, j].generateTransform();
             }
         }
     }
@@ -225,14 +245,16 @@ public class HeatMapViewer : DataViewer
 
     }
 
+
     private void Update()
     {
-        selection.drawSelection();
+
     }
 
     private void OnEnable()
     {
         SceneView.duringSceneGui += OnSceneGUI;
+      
     }
 
     private void OnDestroy()
@@ -243,6 +265,13 @@ public class HeatMapViewer : DataViewer
 
     void OnSceneGUI(SceneView sv)
     {
+        //https://answers.unity.com/questions/594420/how-to-flush-mesh-batch-in-editor-or-how-to-draw-a.html
+        if (lastRenderedFrame != Time.renderedFrameCount)
+        {
+            RenderHeatMap();
+            lastRenderedFrame = Time.renderedFrameCount;
+        }
+
         //doing this in update causes extreme lag bruv
         if (heatmap != null && selecting)
            selection.SelectCubes(heatmap);
@@ -254,16 +283,20 @@ public class HeatMapViewer : DataViewer
         }
         else
         {
-            selection = new HeatSelection();
+            selection = new HeatSelection(this);
         }
     }
 
     void OnGUI()
     {
         setStyles();
-        RenderHeatMap();
+       
        
         GUILayout.Label("HeatMap",inspector_title);
+        if(dirty)
+        {
+            GUILayout.Label("Generate the Heatmap to apply changes");
+        }
         if (!material)
         {
             GUI.enabled = false;
@@ -317,14 +350,34 @@ public class HeatMapViewer : DataViewer
         {
             Debug.Log("swiiitchi"); 
             //THIS DOESNT WORK !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            RenderHeatMap();
-            EditorWindow view = EditorWindow.GetWindow<SceneView>();
-            //SceneView.currentDrawingSceneView.Repaint();
-            view.Repaint();
+           // 04/06 still does not work
+           RenderHeatMap();
+            //EditorWindow view = EditorWindow.GetWindow<SceneView>();
+            SceneView.currentDrawingSceneView.Repaint();
+            lastRenderedFrame = 0;
+           // view.Repaint();
         }
         shape = (HeatCubeShape)EditorGUILayout.EnumPopup("Heat Cubes Shape: ", shape);
 
-        EditorGUILayout.LabelField("Selected Cubes: " + selected_amount);
+
+        EditorGUI.BeginChangeCheck();
+
+        cube_size = EditorGUILayout.FloatField("Cube Size", cube_size);
+        if(EditorGUI.EndChangeCheck())
+        {
+            dirty = true;
+        }
+        EditorGUI.BeginChangeCheck();
+
+        modify_size = EditorGUILayout.Toggle("Modify Size", modify_size);
+        if(modify_size)
+            size_multiplier  = EditorGUILayout.FloatField("Modifier Size", size_multiplier);
+        if (EditorGUI.EndChangeCheck())
+        {
+            adjoustmentsToCubes();
+        }
+
+            EditorGUILayout.LabelField("Selected Cubes: " + selected_amount);
         EditorGUILayout.LabelField("X cells: " + x_cells);
         EditorGUILayout.LabelField("Z cells: " + z_cells);
         EditorGUILayout.LabelField("Max events per cell: " + max_events);

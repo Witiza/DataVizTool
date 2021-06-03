@@ -10,6 +10,9 @@ public class DataViewer : EditorWindow
     public int max_events = 0;
     public Gradient gradient = new Gradient();
 
+    public bool modify_size = false;
+    public float size_multiplier = 0;
+
     public GUIStyle inspector_title = new GUIStyle();
     public GUIStyle text = new GUIStyle();
 
@@ -25,6 +28,8 @@ public class DataViewer : EditorWindow
         }
         return true;
     }
+
+  
 
     public void setStyles()
     {

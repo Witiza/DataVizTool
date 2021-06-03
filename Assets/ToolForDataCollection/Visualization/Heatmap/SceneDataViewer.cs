@@ -46,7 +46,7 @@ public class SceneDataViewer : DataViewer
 
                     foreach (EventTracker tracker in trackers)
                     {
-                        if(ev.target_go == tracker.gameObject) //there must be a better way to do this for sue
+                        if(ev.target_GUID == tracker.getGUID()) //there must be a better way to do this for sue
                         {
                             tracker.events.Add(ev);
                         }
@@ -86,7 +86,7 @@ public class SceneDataViewer : DataViewer
 
         if (GUILayout.Button("Distribute Events"))
         {
-            assignEvents();
+            generateSceneView();
         }
 
         DrawUILine(Color.white,5,20);

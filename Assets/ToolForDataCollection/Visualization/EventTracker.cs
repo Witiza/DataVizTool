@@ -15,7 +15,7 @@ public class EventTracker : MonoBehaviour
 
     void Start()
     {
-
+        getParent();
     }
 
     // Update is called once per frame
@@ -68,20 +68,19 @@ public class EventTracker : MonoBehaviour
     }
     void recursiveParent(Transform trns)
     {
-        if (parent)
+
+        if (trns != null)
         {
-            if (trns != null)
-            {
-                recursiveParent(trns.parent);
-                GUID += trns.GetSiblingIndex() + "-";
-            }
+            recursiveParent(trns.parent);
+            GUID += trns.GetSiblingIndex() + "-";
         }
+
         else
         {
             getParent();
         }
-      
     }
+    
 
     private void OnDrawGizmos()
     {

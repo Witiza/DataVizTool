@@ -10,7 +10,12 @@ public  class HeatSelection
     Vector3 initial_pos = Vector3.one;
     Vector3 final_pos = Vector3.zero;
     Mesh mesh;
+   public HeatMapViewer heatmap;
 
+    public HeatSelection(HeatMapViewer parent)
+    {
+        heatmap = parent;
+    }
     // Start is called before the first frame update
     public void selectionByHandles()
     {
@@ -33,12 +38,25 @@ public  class HeatSelection
             initial_pos.z = final_pos.z;
             final_pos.z = tmp.z;
         }
-
-        Object.FindObjectOfType<HeatMapRenderer>().GetComponent<HeatMapRenderer>().setBoundingBox(initial_pos,final_pos);
+        if (heatmap.renderer != null)
+        {
+            heatmap.renderer.setBoundingBox(initial_pos, final_pos);
+        }
+        else
+        {
+            heatmap.getRenderer();
+        }
     }
     public void MouseCheck(SceneView sv)
     {
-        GameObject.FindObjectOfType<HeatMapRenderer>().GetComponent<HeatMapRenderer>().setBoundingBox(initial_pos, final_pos-initial_pos);
+        if (heatmap.renderer != null)
+        {
+            heatmap.renderer.setBoundingBox(initial_pos, final_pos);
+        }
+        else
+        {
+            heatmap.getRenderer();
+        }
         //button values are 0 for left button, 1 for right button, 2 for the middle button
         if ( Event.current.type == EventType.MouseDrag && Event.current.button == 1)
         {
@@ -103,32 +121,5 @@ public  class HeatSelection
         
 
     }
-    public void drawSelection()
-    {
-
-        if (selecting)
-        {
-
-            float magnitude = (final_pos - initial_pos).magnitude;
-            // Draw.Cube(initial_pos,new Vector3(magnitude,magnitude,magnitude) );
-            
-            Matrix4x4 transform = Matrix4x4.TRS(initial_pos, Quaternion.identity, new Vector3(magnitude, magnitude, magnitude)/2);
-            
-            if (mesh != null)
-            {
-                Material mat = new Material(Shader.Find("Diffuse"));
-                Graphics.DrawMesh(mesh, Matrix4x4.identity,mat,0);
-            }
-            else
-            {
-                mesh = Shapes.GetUnityPrimitiveMesh(PrimitiveType.Cube);
-            }
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+   
 }

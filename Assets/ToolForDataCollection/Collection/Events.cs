@@ -103,7 +103,6 @@ public class BaseEvent
             file.Write(position.x+ "," + position.y + "," + position.z + ",");
         }
         Debug.Log(target_GUID);
-        Debug.Log(name);
         if(target_GUID != "")
         {
                 file.Write(target_GUID + ",");
