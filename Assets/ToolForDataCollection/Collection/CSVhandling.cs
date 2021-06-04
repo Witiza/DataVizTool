@@ -21,13 +21,13 @@ public static  class CSVhandling
         {
             file = new StreamWriter(path,false);
             //First column in metadata indicates if the event uses position;
-            file.WriteLine(events.save_position + ","+events.use_target+",");
+            file.WriteLine(events.save_position + ","+events.use_multiple_targets+",");
             file.Write("PlayerID, SessionID, Timestamp,");
             if (events.save_position)
             {
                 file.Write("X,Y,Z,");
             }
-            else if(events.use_target)
+            else if(events.use_multiple_targets)
             { 
                 file.WriteLine("TargetGUID,");
             }

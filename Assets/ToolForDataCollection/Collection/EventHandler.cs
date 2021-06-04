@@ -73,15 +73,45 @@ public class EventHandler : MonoBehaviour
                 tmp.current_interval += Time.deltaTime;
                 if(tmp.current_interval >= tmp.interval )
                 {
-                    if (tmp.target)
+                    if (tmp.target || tmp.use_target)
                     {
+                        Vector3? pos = null;
+                        if(tmp.save_position)
+                        {
+                            pos = tmp.target.transform.position;
+                        }
                         switch (tmp.type)
                         {
                             case DataEventType.POSITION:
-                                tmp.StoreEvent(tmp.target.transform.position,null);
+                                tmp.StoreEvent(tmp.target.transform.position ,null);
                                 break;
                             case DataEventType.ROTATION:
-                                tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles, tmp.target.transform.position);
+                                tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles, pos);
+                                break;
+                            case DataEventType.CUSTOM:
+                                switch(tmp.s_property.type)
+                                {
+                                    case "int":
+                                        tmp.StoreEvent(tmp.s_property.intValue,pos);
+                                        break;
+                                    case "float":
+                                        tmp.StoreEvent(tmp.s_property.floatValue,pos);
+                                        break;
+                                    case "char":
+                                        tmp.StoreEvent((char)tmp.s_property.intValue,pos);
+                                        break;
+                                    case "string":
+                                        tmp.StoreEvent(tmp.s_property.floatValue,pos);
+                                        break;
+                                    case "bool":
+                                        tmp.StoreEvent(tmp.s_property.floatValue,pos);
+                                        break;
+                                    case "Vector3":
+                                        tmp.StoreEvent(tmp.s_property.vector3Value,pos);
+                                        break;
+
+                                }
+
                                 break;
                         }
                     }
@@ -291,7 +321,6 @@ public class EventHandlerEditor : Editor
                     tmp.type = (DataEventType)EditorGUILayout.EnumPopup("Event Type: ", tmp.type);
                     if(GUI.changed)
                     {
-                        Debug.Log("UEAP");
                         switch(tmp.type)
                         {
                             
@@ -314,7 +343,36 @@ public class EventHandlerEditor : Editor
                                 break;
                         }
                     }
-                  tmp.use_target = EditorGUILayout.Toggle("Each event will have an individual target", tmp.use_target);
+                    EditorGUI.BeginChangeCheck();
+                    tmp.target = (GameObject)EditorGUILayout.ObjectField("Target GameObject", tmp.target, typeof(GameObject), true);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        tmp.target_name = tmp.target.name;
+                        tmp.s_obj = new SerializedObject(tmp.target);
+                        string data_type = CSVhandling.dataTypeToString(tmp.data_type);
+                        if(data_type != "NULL" && data_type != "VECTOR3")
+                        {
+                            data_type.ToLower();
+                        }
+                        else if(data_type == "VECTOR3")
+                        {
+                            data_type = "Vector3";
+                        }
+                        if (data_type != "NULL")
+                        {
+                            tmp.options = generatePropertyList(tmp.s_obj, data_type);
+                        }
+                    }
+                    if(tmp.target != null)
+                    {
+                        EditorGUI.BeginChangeCheck();
+                        tmp.index = EditorGUI.Popup( new Rect(0, 0, 100, 20),  "Variable:", tmp.index, tmp.options);
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            tmp.s_property = tmp.s_obj.FindProperty(tmp.options[tmp.index]);
+                        }
+                    }
+                    tmp.use_multiple_targets = EditorGUILayout.Toggle("Each event will have an individual target", tmp.use_multiple_targets);
                     if (tmp.type != DataEventType.POSITION && tmp.type != DataEventType.ROTATION)
                     {
                         tmp.use_frequency = EditorGUILayout.Toggle("Use Frequency", tmp.use_frequency);
@@ -335,6 +393,7 @@ public class EventHandlerEditor : Editor
                             break;
                         case DataEventType.CUSTOM:
                             tmp.data_type = (DataType)EditorGUILayout.EnumPopup("Data Type: ", tmp.data_type);
+
                             break;
                     };
                     if (GUILayout.Button("Delete Event"))
@@ -349,6 +408,25 @@ public class EventHandlerEditor : Editor
         }
     }
 
+    string[] generatePropertyList(SerializedObject obj, string data_type)
+    {
+        List<string> ret = new List<string>();
+        SerializedProperty prop = obj.GetIterator();
+        {
+            if (prop.NextVisible(true))
+            {
+                do
+                {
+                   if(prop.type == data_type)
+                    {
+                        ret.Add(prop.name);
+                    }
+                }
+                while (prop.NextVisible(false));
+            }
+        }
+        return ret.ToArray();
+    }
     void GenerateFoldouts()
     {
         foldouts.Clear();
@@ -378,11 +456,22 @@ public class StandardEvent
     public List<BaseEvent> ingame_events;
     public DataEventType type;
     public DataType data_type;
-    public bool use_frequency;
-    public bool save_position;
-    public bool use_target;
+    public bool use_frequency = false;
+    public bool save_position = false;
+    public bool use_multiple_targets = false;
+    public bool use_target = false;
     int playerID;
     int sessionID;
+    [System.NonSerialized]
+    public int index = 0;
+    [System.NonSerialized]
+    public string[] options;
+    [System.NonSerialized]
+    public SerializedObject s_obj;
+    [System.NonSerialized]
+    public SerializedProperty s_property;
+
+
 
 
     [System.NonSerialized]
@@ -415,6 +504,16 @@ public class StandardEvent
     public void StoreEvent(float ev, Vector3? pos = null, GameObject target = null)
     {
         FloatEvent tmp = new FloatEvent(ev, name, playerID, sessionID,pos, target);
+        ingame_events.Add(tmp);
+    }
+    public void StoreEvent(string ev, Vector3? pos = null, GameObject target = null)
+    {
+        StringEvent tmp = new StringEvent(ev, name, playerID, sessionID, pos, target);
+        ingame_events.Add(tmp);
+    }
+    public void StoreEvent(char ev, Vector3? pos = null, GameObject target = null)
+    {
+        CharEvent tmp = new CharEvent(ev, name, playerID, sessionID, pos, target);
         ingame_events.Add(tmp);
     }
     public void StoreEvent(Vector3 ev, Vector3? pos = null, GameObject target = null)
