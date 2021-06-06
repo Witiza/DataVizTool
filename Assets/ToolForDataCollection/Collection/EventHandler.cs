@@ -89,6 +89,7 @@ public class EventHandler : MonoBehaviour
                                 tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles, pos);
                                 break;
                             case DataEventType.CUSTOM:
+                                tmp.s_obj.Update();
                                 switch(tmp.s_property.type)
                                 {
                                     case "int":
@@ -254,7 +255,7 @@ public class EventHandler : MonoBehaviour
         {
             if(events[i].target_name != null&& events[i].target_name != "")
             {
-              
+
                 if(!(events[i].target = GameObject.Find(events[i].target_name)))
                 {
                     //events[i].target = CSVhandling.getGameObject(events[i].target_GUID);
@@ -262,8 +263,26 @@ public class EventHandler : MonoBehaviour
                     {
                         Debug.LogError("Couldnt find target GameObject for event: " + events[i].name);
                     }
+                  
                 }
-                
+                else
+                {
+                    if (events[i].type != DataEventType.POSITION)
+                    {
+                        Debug.Log("start");
+                        var component = events[i].target.GetComponent(events[i].script_name);
+                        if (component)
+                        {
+                            events[i].s_obj = new SerializedObject(component);
+                            if (events[i].s_obj != null)
+                            {
+                                events[i].s_property = events[i].s_obj.FindProperty(events[i].variable_name);
+                            }
+
+                        }
+                    }
+                }
+
             }
         }
     }
@@ -348,29 +367,38 @@ public class EventHandlerEditor : Editor
                     if (EditorGUI.EndChangeCheck())
                     {
                         tmp.target_name = tmp.target.name;
-                        tmp.s_obj = new SerializedObject(tmp.target);
-                        string data_type = CSVhandling.dataTypeToString(tmp.data_type);
-                        if(data_type != "NULL" && data_type != "VECTOR3")
-                        {
-                            data_type.ToLower();
-                        }
-                        else if(data_type == "VECTOR3")
-                        {
-                            data_type = "Vector3";
-                        }
-                        if (data_type != "NULL")
-                        {
-                            tmp.options = generatePropertyList(tmp.s_obj, data_type);
-                        }
                     }
                     if(tmp.target != null)
                     {
                         EditorGUI.BeginChangeCheck();
-                        tmp.index = EditorGUI.Popup( new Rect(0, 0, 100, 20),  "Variable:", tmp.index, tmp.options);
+                        tmp.script_name = EditorGUILayout.TextField("Script containing the variable", tmp.script_name);
                         if (EditorGUI.EndChangeCheck())
                         {
-                            tmp.s_property = tmp.s_obj.FindProperty(tmp.options[tmp.index]);
+                            var component = tmp.target.GetComponent(tmp.script_name);
+                            if (component)
+                            {
+                                tmp.s_obj = new SerializedObject(component);
+                                Debug.Log("Obj: " + tmp.s_obj);
+
+                            }
                         }
+                        if(tmp.s_obj == null)
+                        {
+                            EditorGUILayout.LabelField("Could not find script " + tmp.script_name + " in the GO: " + tmp.target.name);
+                        }
+                        EditorGUI.BeginChangeCheck();
+                        tmp.variable_name = EditorGUILayout.TextField("Variable to track", tmp.variable_name);
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            tmp.s_property = tmp.s_obj.FindProperty(tmp.variable_name);
+                            //Debug.Log("Property : " + tmp.s_property.type);
+                        }
+                        if (tmp.s_property == null)
+                        {
+
+                            EditorGUILayout.LabelField("Could not find variable " + tmp.variable_name + " in the script. Remember to make it serializable");
+                        }
+
                     }
                     tmp.use_multiple_targets = EditorGUILayout.Toggle("Each event will have an individual target", tmp.use_multiple_targets);
                     if (tmp.type != DataEventType.POSITION && tmp.type != DataEventType.ROTATION)
@@ -408,25 +436,6 @@ public class EventHandlerEditor : Editor
         }
     }
 
-    string[] generatePropertyList(SerializedObject obj, string data_type)
-    {
-        List<string> ret = new List<string>();
-        SerializedProperty prop = obj.GetIterator();
-        {
-            if (prop.NextVisible(true))
-            {
-                do
-                {
-                   if(prop.type == data_type)
-                    {
-                        ret.Add(prop.name);
-                    }
-                }
-                while (prop.NextVisible(false));
-            }
-        }
-        return ret.ToArray();
-    }
     void GenerateFoldouts()
     {
         foldouts.Clear();
@@ -463,13 +472,14 @@ public class StandardEvent
     int playerID;
     int sessionID;
     [System.NonSerialized]
-    public int index = 0;
-    [System.NonSerialized]
     public string[] options;
     [System.NonSerialized]
-    public SerializedObject s_obj;
+    public SerializedObject s_obj = null;
     [System.NonSerialized]
-    public SerializedProperty s_property;
+    public SerializedProperty s_property = null;
+    public string script_name = "script name";
+    public string variable_name = "variable name";
+
 
 
 

@@ -40,19 +40,21 @@ public class BaseEvent
             position = pos.Value;
             use_pos = true;
         }
+        if (_target != null)
+        {
+            EventTracker tmp = _target.GetComponent<EventTracker>();
+            //   Debug.Log(tmp.gameObject.name);
+            if (tmp != null)
+            {
+                target_GUID = tmp.getGUID();
+                //Debug.Log("GUID: " + tmp.GUID);
+            }
+            else
+            {
+                Debug.LogWarning("Trying to add GameObject " + _target + " without and EventTracker component");
+            }
+        }
 
-        EventTracker tmp = _target.GetComponent<EventTracker>();
-        Debug.Log(tmp.gameObject.name);
-        if (tmp != null)
-        {
-            Debug.Log("tracker exists");
-            target_GUID = tmp.getGUID();
-            //Debug.Log("GUID: " + tmp.GUID);
-        }
-        else
-        {
-            Debug.LogWarning("Trying to add GameObject " + _target + " without and EventTracker component");
-        }
     }
 
     public BaseEvent(string line, string _name, bool use_position, bool use_target)
