@@ -12,7 +12,8 @@ public class EventContainer
     }
     public bool in_use = true;
     public string name;
-    public DataType type;
+    public DataType data_type;
+    public DataEventType type;
     public List<BaseEvent> events;
     public bool use_position;
     public bool use_target;
@@ -104,7 +105,6 @@ public class BaseEvent
         {
             file.Write(position.x+ "," + position.y + "," + position.z + ",");
         }
-        Debug.Log(target_GUID);
         if(target_GUID != "")
         {
                 file.Write(target_GUID + ",");
@@ -127,7 +127,7 @@ class BoolEvent : BaseEvent
     public override void saveToCSV(StreamWriter file)
     {
         base.saveToCSV(file);
-        file.WriteLine(data);
+        file.Write(data);
     }
 };
 
@@ -145,14 +145,14 @@ class IntEvent : BaseEvent
     public override void saveToCSV(StreamWriter file)
     {
         base.saveToCSV(file);
-        file.WriteLine(data);
+        file.Write(data);
     }
 };
 
 class FloatEvent : BaseEvent
 {
     public float data;
-    public FloatEvent(float ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos,target)
+    public FloatEvent(float ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
     {
         data = ev;
     }
@@ -163,27 +163,9 @@ class FloatEvent : BaseEvent
     public override void saveToCSV(StreamWriter file)
     {
         base.saveToCSV(file);
-        file.WriteLine(data);
+        file.Write(data);
     }
-}
-
-class CharEvent : BaseEvent
-{
-    public char data;
-    public CharEvent(char ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
-    {
-        data = ev;
-    }
-    public CharEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
-    {
-        data = char.Parse(line.Substring(line.LastIndexOf(',') + 1));
-    }
-    public override void saveToCSV(StreamWriter file)
-    {
-        base.saveToCSV(file);
-        file.WriteLine(data);
-    }
-}
+};
 class StringEvent : BaseEvent
 {
     
@@ -199,7 +181,7 @@ class StringEvent : BaseEvent
     public override void saveToCSV(StreamWriter file)
     {
         base.saveToCSV(file);
-        file.WriteLine(data);
+        file.Write(data);
     }
 };
 public class Vector3Event : BaseEvent
@@ -231,7 +213,7 @@ public class Vector3Event : BaseEvent
     public override void saveToCSV(StreamWriter file)
     {
         base.saveToCSV(file);
-        file.WriteLine(data.x + "," + data.y + "," + data.z);
+        file.Write(data.x + "," + data.y + "," + data.z);
 
     }
-}
+};

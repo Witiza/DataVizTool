@@ -299,13 +299,15 @@ public class HeatMapViewer : DataViewer
         }
         if (!material)
         {
-            GUI.enabled = false;
+
             EditorGUILayout.LabelField("Add a Material");
+            GUI.enabled = false;
         }
         if(events.Count==0)
         {
-            GUI.enabled = false;
+
             EditorGUILayout.LabelField("No Events Loaded");
+            GUI.enabled = false;
         }
         if (GUILayout.Button("Generate Heatmap"))
         {

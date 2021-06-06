@@ -20,14 +20,14 @@ public static  class CSVhandling
         else
         {
             file = new StreamWriter(path,false);
-            //First column in metadata indicates if the event uses position;
-            file.WriteLine(events.save_position + ","+events.use_multiple_targets+",");
+            //First column in metadata indicates if the event uses position;, the second one indicates if the event is using multiple targets
+            file.WriteLine(events.save_position + ","+ (events.type == DataEventType.MULTI_TARGET )+ ",");
             file.Write("PlayerID, SessionID, Timestamp,");
             if (events.save_position)
             {
                 file.Write("X,Y,Z,");
             }
-            else if(events.use_multiple_targets)
+           if(events.type == DataEventType.MULTI_TARGET)
             { 
                 file.WriteLine("TargetGUID,");
             }
@@ -38,10 +38,8 @@ public static  class CSVhandling
         for(int i = 0;i<events.ingame_events.Count;i++)
         {
             events.ingame_events[i].saveToCSV(file);
-            if (events.data_type == DataType.NULL)
-            {
-                file.WriteLine();
-            }
+            file.WriteLine();
+            
         }
         file.Close();
     }
@@ -65,49 +63,42 @@ public static  class CSVhandling
             switch (data_type)
             {
                 case "NULL":
-                    ret.type = DataType.NULL;
+                    ret.data_type = DataType.NULL;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new BaseEvent(line, name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "BOOL":
-                    ret.type = DataType.BOOL;
+                    ret.data_type = DataType.BOOL;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new BoolEvent(line,name,ret.use_position,ret.use_target));
                      }
                     break;
                 case "INT":
-                    ret.type = DataType.INT;
+                    ret.data_type = DataType.INT;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new IntEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "FLOAT":
-                    ret.type = DataType.FLOAT;
+                    ret.data_type = DataType.FLOAT;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new FloatEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
-                case "CHAR":
-                    ret.type = DataType.CHAR;
-                    while ((line = file.ReadLine()) != null)
-                    {
-                        ret.events.Add(new CharEvent(line,name, ret.use_position, ret.use_target));
-                    }
-                    break;
                 case "STRING":
-                    ret.type = DataType.STRING;
+                    ret.data_type = DataType.STRING;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new StringEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "VECTOR3":
-                    ret.type = DataType.VECTOR3;
+                    ret.data_type = DataType.VECTOR3;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new Vector3Event(line,name, ret.use_position, ret.use_target ));
@@ -155,9 +146,6 @@ public static  class CSVhandling
                 break;
             case DataType.FLOAT:
                 ret = "FLOAT";
-                break;
-            case DataType.CHAR:
-                ret = "CHAR";
                 break;
             case DataType.STRING:
                 ret = "STRING";

@@ -9,10 +9,9 @@ public enum DataEventType
 {
     POSITION,
     ROTATION,
-    LEVEL_START,
-    LEVEL_SUCCESS,
-    LEVEL_FAILURE,
-    CUSTOM
+    NO_TARGET,
+    TARGETED,
+    MULTI_TARGET
 };
 
 public enum DataType
@@ -21,7 +20,6 @@ public enum DataType
     BOOL,
     INT,
     FLOAT,
-    CHAR,
     STRING,
     VECTOR3
 };
@@ -68,12 +66,12 @@ public class EventHandler : MonoBehaviour
         for (int i = 0;i<events.Count;i++)
         {
             StandardEvent tmp = events[i];
-            if(tmp.use_frequency)
+            if(tmp.use_frequency&&tmp.active)
             {
                 tmp.current_interval += Time.deltaTime;
                 if(tmp.current_interval >= tmp.interval )
                 {
-                    if (tmp.target || tmp.use_target)
+                    if (tmp.type == DataEventType.POSITION|| tmp.type == DataEventType.ROTATION|| tmp.type == DataEventType.TARGETED)
                     {
                         Vector3? pos = null;
                         if(tmp.save_position)
@@ -88,7 +86,7 @@ public class EventHandler : MonoBehaviour
                             case DataEventType.ROTATION:
                                 tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles, pos);
                                 break;
-                            case DataEventType.CUSTOM:
+                            case DataEventType.TARGETED:
                                 tmp.s_obj.Update();
                                 switch(tmp.s_property.type)
                                 {
@@ -97,9 +95,6 @@ public class EventHandler : MonoBehaviour
                                         break;
                                     case "float":
                                         tmp.StoreEvent(tmp.s_property.floatValue,pos);
-                                        break;
-                                    case "char":
-                                        tmp.StoreEvent((char)tmp.s_property.intValue,pos);
                                         break;
                                     case "string":
                                         tmp.StoreEvent(tmp.s_property.floatValue,pos);
@@ -110,7 +105,6 @@ public class EventHandler : MonoBehaviour
                                     case "Vector3":
                                         tmp.StoreEvent(tmp.s_property.vector3Value,pos);
                                         break;
-
                                 }
 
                                 break;
@@ -164,6 +158,22 @@ public class EventHandler : MonoBehaviour
             Debug.LogError("Trying to store an event without an EventHandler in the scene");
         }
     }
+
+    static public void StoreEventStatic(string event_name, string data, Vector3? pos = null, GameObject target = null)
+    {
+        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
+        EventHandler tmp;
+        if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        {
+
+            tmp.StoreEvent(event_name, data, pos, target);
+
+        }
+        else
+        {
+            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+        }
+    }
     static public void StoreEventStatic(string event_name, Vector3 data, Vector3? pos = null, GameObject target = null)
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
@@ -173,6 +183,21 @@ public class EventHandler : MonoBehaviour
 
             tmp.StoreEvent(event_name, data, pos,target);
             
+        }
+        else
+        {
+            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+        }
+    }
+    static public void StoreEventStatic(string event_name, Vector3? pos = null, GameObject target = null)
+    {
+        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
+        EventHandler tmp;
+        if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        {
+
+            tmp.StoreEvent(event_name, pos, target);
+
         }
         else
         {
@@ -210,6 +235,16 @@ public class EventHandler : MonoBehaviour
             }
         }
     }
+    public void StoreEvent(string event_name, string data, Vector3? pos = null, GameObject target = null)
+    {
+        for (int i = 0; i < events.Count; i++)
+        {
+            if (events[i].name == event_name)
+            {
+                events[i].StoreEvent(data, pos, target);
+            }
+        }
+    }
     public void StoreEvent(string event_name, Vector3 data, Vector3? pos = null, GameObject target = null)
     {
         for (int i = 0; i < events.Count; i++)
@@ -217,6 +252,17 @@ public class EventHandler : MonoBehaviour
             if (events[i].name == event_name)
             {
                 events[i].StoreEvent(data,pos,target);
+            }
+        }
+    }
+
+    public void StoreEvent(string event_name, Vector3? pos = null, GameObject target = null)
+    {
+        for (int i = 0; i < events.Count; i++)
+        {
+            if (events[i].name == event_name)
+            {
+                events[i].StoreEvent(pos, target);
             }
         }
     }
@@ -300,10 +346,19 @@ public class EventHandlerEditor : Editor
     EventHandler handler;
     List<bool> foldouts = new List<bool>();
     bool loaded_events = false;
-   
+
+    public GUIStyle inspector_title = new GUIStyle();
+    public GUIStyle text = new GUIStyle();
+    public void setStyles()
+    {
+        inspector_title.fontSize = 20;
+        inspector_title.normal.textColor = Color.white;
+        inspector_title.alignment = TextAnchor.MiddleCenter;
+    }
 
     public override void OnInspectorGUI()
     {
+        setStyles();
         if (!Application.isPlaying)
         {
             handler = (EventHandler)target;
@@ -313,11 +368,8 @@ public class EventHandlerEditor : Editor
                 loaded_events = true;
             }
 
-            //DrawDefaultInspector();
+            EditorGUILayout.LabelField("Event Handler", inspector_title);
 
-
-
-            EditorGUILayout.HelpBox("This is a help box", MessageType.Info);
             if (GUILayout.Button("Add Event"))
             {
                 handler.AddEvent();
@@ -330,78 +382,91 @@ public class EventHandlerEditor : Editor
             }
             for (int i = 0; i < handler.events.Count; i++)
             {
-                //StandardEvent tmp = events.GetArrayElementAtIndex(i).objectReferenceValue as StandardEvent;
                 StandardEvent tmp = handler.events[i];
                 foldouts[i] = EditorGUILayout.BeginFoldoutHeaderGroup(foldouts[i], tmp.name);
                 if (foldouts[i])
                 {
                     tmp.name = EditorGUILayout.TextField("Event Name: ", tmp.name);
-                    GUI.changed = false;
+                    tmp.active = EditorGUILayout.Toggle("Event is Active", tmp.active);
+                    if(!tmp.active)
+                    {
+                        GUI.enabled = false;
+                    }
+                    EditorGUI.BeginChangeCheck();
                     tmp.type = (DataEventType)EditorGUILayout.EnumPopup("Event Type: ", tmp.type);
-                    if(GUI.changed)
+                    if(EditorGUI.EndChangeCheck())
                     {
                         switch(tmp.type)
                         {
-                            
-                            case DataEventType.LEVEL_START:
-                                tmp.data_type = DataType.BOOL;
-                                break;
-                            case DataEventType.LEVEL_FAILURE:
-                                tmp.data_type = DataType.BOOL;
-                                break;
-                            case DataEventType.LEVEL_SUCCESS:
-                                tmp.data_type = DataType.BOOL;
-                                break;
                             case DataEventType.POSITION:
                                 tmp.data_type = DataType.NULL;
                                 tmp.save_position = true;
+                                tmp.use_target = true;
+                                tmp.use_frequency = true;
                                 break;
                             case DataEventType.ROTATION:
                                 tmp.data_type = DataType.VECTOR3;
                                 tmp.save_position = true;
+                                tmp.use_target = true;
+                                tmp.use_frequency = true;
+                                break;
+                            case DataEventType.NO_TARGET: 
+                                tmp.use_target = false;
+                                tmp.save_position = false;
+                                tmp.use_frequency = false;
+                                break;
+                            case DataEventType.MULTI_TARGET:
+                                tmp.use_target = false;
+                                tmp.save_position = false;
+                                tmp.use_frequency = false;
+                                break;
+                            case DataEventType.TARGETED:
+                                tmp.use_frequency = true;
+                                tmp.use_target = true;
                                 break;
                         }
                     }
-                    EditorGUI.BeginChangeCheck();
-                    tmp.target = (GameObject)EditorGUILayout.ObjectField("Target GameObject", tmp.target, typeof(GameObject), true);
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        tmp.target_name = tmp.target.name;
-                    }
-                    if(tmp.target != null)
+                    if (tmp.use_target)
                     {
                         EditorGUI.BeginChangeCheck();
-                        tmp.script_name = EditorGUILayout.TextField("Script containing the variable", tmp.script_name);
+                        tmp.target = (GameObject)EditorGUILayout.ObjectField("Target GameObject", tmp.target, typeof(GameObject), true);
                         if (EditorGUI.EndChangeCheck())
                         {
-                            var component = tmp.target.GetComponent(tmp.script_name);
-                            if (component)
+                            tmp.target_name = tmp.target.name;
+                        }
+                        if (tmp.target != null && tmp.type == DataEventType.TARGETED)
+                        {
+                            EditorGUI.BeginChangeCheck();
+                            tmp.script_name = EditorGUILayout.TextField("Script containing the variable", tmp.script_name);
+                            if (EditorGUI.EndChangeCheck())
                             {
-                                tmp.s_obj = new SerializedObject(component);
-                                Debug.Log("Obj: " + tmp.s_obj);
-
+                                tmp.s_obj = null;
+                                var component = tmp.target.GetComponent(tmp.script_name);
+                                if (component != null)
+                                {
+                                    tmp.s_obj = new SerializedObject(component);
+                                }
                             }
-                        }
-                        if(tmp.s_obj == null)
-                        {
-                            EditorGUILayout.LabelField("Could not find script " + tmp.script_name + " in the GO: " + tmp.target.name);
-                        }
-                        EditorGUI.BeginChangeCheck();
-                        tmp.variable_name = EditorGUILayout.TextField("Variable to track", tmp.variable_name);
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            tmp.s_property = tmp.s_obj.FindProperty(tmp.variable_name);
-                            //Debug.Log("Property : " + tmp.s_property.type);
-                        }
-                        if (tmp.s_property == null)
-                        {
 
-                            EditorGUILayout.LabelField("Could not find variable " + tmp.variable_name + " in the script. Remember to make it serializable");
-                        }
+                            if (tmp.s_obj == null)
+                            {
+                                EditorGUILayout.LabelField("Could not find script " + tmp.script_name + " in the GO: " + tmp.target.name);
+                            }
+                            EditorGUI.BeginChangeCheck();
+                            tmp.variable_name = EditorGUILayout.TextField("Variable to track", tmp.variable_name);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                tmp.s_property = tmp.s_obj.FindProperty(tmp.variable_name);
+                            }
+                            if (tmp.s_property == null)
+                            {
 
+                                EditorGUILayout.LabelField("Could not find variable " + tmp.variable_name + " in the script. Remember to make it serializable");
+                            }
+
+                        }
                     }
-                    tmp.use_multiple_targets = EditorGUILayout.Toggle("Each event will have an individual target", tmp.use_multiple_targets);
-                    if (tmp.type != DataEventType.POSITION && tmp.type != DataEventType.ROTATION)
+                    if (tmp.type == DataEventType.TARGETED)
                     {
                         tmp.use_frequency = EditorGUILayout.Toggle("Use Frequency", tmp.use_frequency);
                         tmp.save_position = EditorGUILayout.Toggle("Save Position", tmp.save_position);
@@ -410,25 +475,17 @@ public class EventHandlerEditor : Editor
                     {
                         tmp.interval = EditorGUILayout.FloatField("Event Frequency", tmp.interval);
                     }
-                    switch (tmp.type)
-                    {
-                        case DataEventType.POSITION:
-
-                            if (tmp.target = (GameObject)EditorGUILayout.ObjectField("Target GameObject", tmp.target, typeof(GameObject), true))
-                            {
-                                tmp.target_name = tmp.target.name;
-                            }
-                            break;
-                        case DataEventType.CUSTOM:
-                            tmp.data_type = (DataType)EditorGUILayout.EnumPopup("Data Type: ", tmp.data_type);
-
-                            break;
-                    };
+                  
+                    tmp.data_type = (DataType)EditorGUILayout.EnumPopup("Data Type: ", tmp.data_type);
                     if (GUILayout.Button("Delete Event"))
                     {
                         handler.events.RemoveAt(i);
                         foldouts.RemoveAt(i);
                     }
+                }
+                if (!tmp.active)
+                {
+                    GUI.enabled = true;
                 }
                 EditorGUILayout.EndFoldoutHeaderGroup();
                 handler.SaveEditorEvents();
@@ -450,6 +507,7 @@ public class EventHandlerEditor : Editor
 [System.Serializable]
 public class StandardEvent
 {
+    public bool active = true;
     public float interval = 1;
     public float current_interval = 0;
     uint eventID = 0;
@@ -467,7 +525,6 @@ public class StandardEvent
     public DataType data_type;
     public bool use_frequency = false;
     public bool save_position = false;
-    public bool use_multiple_targets = false;
     public bool use_target = false;
     int playerID;
     int sessionID;
@@ -494,7 +551,7 @@ public class StandardEvent
     {
         name = "EVENTNAME";
        // generateID();
-        type =DataEventType.CUSTOM;
+        type =DataEventType.NO_TARGET;
         data_type = DataType.INT;
         ingame_events = new List<BaseEvent>();
       //  scene = SceneManager.GetActiveScene().name;
@@ -521,18 +578,13 @@ public class StandardEvent
         StringEvent tmp = new StringEvent(ev, name, playerID, sessionID, pos, target);
         ingame_events.Add(tmp);
     }
-    public void StoreEvent(char ev, Vector3? pos = null, GameObject target = null)
-    {
-        CharEvent tmp = new CharEvent(ev, name, playerID, sessionID, pos, target);
-        ingame_events.Add(tmp);
-    }
     public void StoreEvent(Vector3 ev, Vector3? pos = null, GameObject target = null)
     {
         Vector3Event tmp = new Vector3Event(ev, name, playerID, sessionID, pos, target);
 
         ingame_events.Add(tmp);
     }
-    public void StoreEvent(Vector3 pos, GameObject target = null)
+    public void StoreEvent(Vector3? pos=null, GameObject target = null)
     {
         BaseEvent tmp = new BaseEvent(name, playerID, sessionID, pos, target);
         ingame_events.Add(tmp);
