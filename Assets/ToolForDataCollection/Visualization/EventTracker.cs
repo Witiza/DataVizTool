@@ -21,7 +21,7 @@ public class EventTracker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        Debug.Log("Stored events: " + events.Count);
     }
 
     void getParent()
@@ -87,7 +87,7 @@ public class EventTracker : MonoBehaviour
         if (parent != null)
         {
             Gizmos.color = color;
-            Gizmos.DrawCube(gameObject.transform.position, new Vector3(10 * events.Count, 10 * events.Count, 10 * events.Count));
+            Gizmos.DrawCube(gameObject.transform.position, new Vector3(1+  events.Count, 1+ events.Count, 1+ events.Count));
         }
         else
         {

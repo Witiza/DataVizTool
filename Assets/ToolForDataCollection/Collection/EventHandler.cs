@@ -81,29 +81,29 @@ public class EventHandler : MonoBehaviour
                         switch (tmp.type)
                         {
                             case DataEventType.POSITION:
-                                tmp.StoreEvent(tmp.target.transform.position ,null);
+                                tmp.StoreEvent(tmp.target.transform.position ,tmp.target);
                                 break;
                             case DataEventType.ROTATION:
-                                tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles, pos);
+                                tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles, pos,tmp.target);
                                 break;
                             case DataEventType.TARGETED:
                                 tmp.s_obj.Update();
                                 switch(tmp.s_property.type)
                                 {
                                     case "int":
-                                        tmp.StoreEvent(tmp.s_property.intValue,pos);
+                                        tmp.StoreEvent(tmp.s_property.intValue,pos,tmp.target);
                                         break;
                                     case "float":
-                                        tmp.StoreEvent(tmp.s_property.floatValue,pos);
+                                        tmp.StoreEvent(tmp.s_property.floatValue,pos, tmp.target);
                                         break;
                                     case "string":
-                                        tmp.StoreEvent(tmp.s_property.floatValue,pos);
+                                        tmp.StoreEvent(tmp.s_property.floatValue,pos, tmp.target);
                                         break;
                                     case "bool":
-                                        tmp.StoreEvent(tmp.s_property.floatValue,pos);
+                                        tmp.StoreEvent(tmp.s_property.floatValue,pos, tmp.target);
                                         break;
                                     case "Vector3":
-                                        tmp.StoreEvent(tmp.s_property.vector3Value,pos);
+                                        tmp.StoreEvent(tmp.s_property.vector3Value,pos, tmp.target);
                                         break;
                                 }
 

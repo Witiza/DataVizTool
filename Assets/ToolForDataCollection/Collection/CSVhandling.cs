@@ -21,7 +21,8 @@ public static  class CSVhandling
         {
             file = new StreamWriter(path,false);
             //First column in metadata indicates if the event uses position;, the second one indicates if the event is using multiple targets
-            file.WriteLine(events.save_position + ","+ (events.type == DataEventType.MULTI_TARGET )+ ",");
+
+            file.WriteLine(events.save_position + ","+ (events.use_target)+ ",");
             file.Write("PlayerID, SessionID, Timestamp,");
             if (events.save_position)
             {
@@ -29,7 +30,11 @@ public static  class CSVhandling
             }
            if(events.type == DataEventType.MULTI_TARGET)
             { 
-                file.WriteLine("TargetGUID,");
+                file.Write("TargetGUID,");
+            }
+           if(events.use_target)
+           {
+                file.Write("TargetName,");
             }
             file.WriteLine();
         }

@@ -16,10 +16,11 @@ public class SceneDataViewer : DataViewer
 
 
     List<EventTracker> trackers = new List<EventTracker>();
-
+    bool generated;
 
     void generateSceneView()
     {
+        cleanTrackers();
         assignEvents();
         generateMaxEvents();
         generateColors();
@@ -32,8 +33,16 @@ public class SceneDataViewer : DataViewer
         {
             Debug.LogWarning("Tyring to visualize events in the scene without any EventTracker");
         }
+        generated = false;
     }
 
+    void cleanTrackers()
+    {
+        foreach(EventTracker tracker in trackers)
+        {
+            tracker.events.Clear();
+        }
+    }
     void assignEvents()
     {
         foreach(EventContainer container in events)
@@ -43,14 +52,24 @@ public class SceneDataViewer : DataViewer
             {
                 foreach(BaseEvent ev in container.events)
                 {
-
-                    foreach (EventTracker tracker in trackers)
+                    EventTracker tracker = ev.target_go.GetComponent<EventTracker>();
+                    if(tracker)
                     {
-                        if(ev.target_GUID == tracker.getGUID()) //there must be a better way to do this for sue
-                        {
-                            tracker.events.Add(ev);
-                        }
+                        tracker.events.Add(ev);
                     }
+                    else
+                    {
+                        Debug.LogWarning("Event discarded because there was no event_tracker attached to the target");
+                    }
+
+
+                    //foreach (EventTracker tracker in trackers)
+                    //{
+                    //    if(ev.target_GUID == tracker.getGUID()) //there must be a better way to do this for sue
+                    //    {
+                    //        tracker.events.Add(ev);
+                    //    }
+                    //}
                 }
             }
         }

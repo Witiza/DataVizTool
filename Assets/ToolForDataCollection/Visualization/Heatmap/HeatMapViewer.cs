@@ -355,7 +355,7 @@ public class HeatMapViewer : DataViewer
            // 04/06 still does not work
            RenderHeatMap();
             //EditorWindow view = EditorWindow.GetWindow<SceneView>();
-            SceneView.currentDrawingSceneView.Repaint();
+          //  SceneView.currentDrawingSceneView.Repaint();
             lastRenderedFrame = 0;
            // view.Repaint();
         }

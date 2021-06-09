@@ -75,7 +75,7 @@ public class HeatCube
         {
             median_height += ev.position.y;
         }
-        median_height /= events.Count+1; //Fuck u NaN
+        median_height /= events.Count; 
         position.y = median_height;
     }
 

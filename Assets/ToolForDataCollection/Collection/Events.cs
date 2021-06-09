@@ -29,6 +29,7 @@ public class BaseEvent
     public Vector3 position;
     public GameObject target_go;
     public string target_GUID = "";
+    public string target_name="";
 
     public BaseEvent(string _name,int player_id, int session_id, Vector3? pos, GameObject _target)
     {
@@ -52,8 +53,12 @@ public class BaseEvent
             }
             else
             {
-                Debug.LogWarning("Trying to add GameObject " + _target + " without and EventTracker component");
+                target_name = _target.name;
             }
+            //else
+            //{
+            //    Debug.LogWarning("Trying to add GameObject " + _target + " to a multi targeted event without and EventTracker component");
+            //}
         }
 
     }
@@ -93,8 +98,25 @@ public class BaseEvent
 
             start = end + 1;
             end = line.IndexOf(',', start);
-            target_GUID = line.Substring(start, end - start);
-            target_go = CSVhandling.getGameObject(target_GUID);
+            string subline = line.Substring(start, end - start);
+            if (subline[subline.Length-1] == '-')
+            {
+                target_GUID = subline;
+                target_go = CSVhandling.getGameObject(target_GUID);
+            }
+            else
+            {
+                target_name = subline;
+                if (!(target_go = GameObject.Find(target_name)))
+                {
+                    //events[i].target = CSVhandling.getGameObject(events[i].target_GUID);
+                    if (target_go == null)
+                    {
+                        Debug.LogError("Couldnt find target GameObject with name "+target_name );
+                    }
+
+                }
+            }
         }
     }
 
@@ -107,7 +129,11 @@ public class BaseEvent
         }
         if(target_GUID != "")
         {
-                file.Write(target_GUID + ",");
+          file.Write(target_GUID + ",");
+        }
+        else if(target_name != "")
+        {
+            file.Write(target_name + ",");
         }
     }
 };
@@ -213,7 +239,7 @@ public class Vector3Event : BaseEvent
     public override void saveToCSV(StreamWriter file)
     {
         base.saveToCSV(file);
-        file.Write(data.x + "," + data.y + "," + data.z);
+        file.Write(data.x + "," + data.y + "," + data.z+",");
 
     }
 };
