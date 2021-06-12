@@ -18,6 +18,7 @@ public class EventContainer
     public bool use_position;
     public bool use_target;
     public bool empty = false;
+    public Color color;
 }
 public class BaseEvent
 {

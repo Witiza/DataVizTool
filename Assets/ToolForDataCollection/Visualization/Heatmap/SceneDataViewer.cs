@@ -17,6 +17,9 @@ public class SceneDataViewer : DataViewer
 
     List<EventTracker> trackers = new List<EventTracker>();
     bool generated;
+    public float y_multiplier = 1;
+    public bool sepparated;
+    public bool selection;
 
     void generateSceneView()
     {
@@ -24,6 +27,7 @@ public class SceneDataViewer : DataViewer
         assignEvents();
         generateMaxEvents();
         generateColors();
+        sepparateEvents();
     }
     void Awake()
     {
@@ -41,14 +45,15 @@ public class SceneDataViewer : DataViewer
         foreach(EventTracker tracker in trackers)
         {
             tracker.events.Clear();
+            tracker.sepparated_events.Clear();
         }
     }
     void assignEvents()
     {
         foreach(EventContainer container in events)
         {
-
-            if(container.use_target)
+            
+            if(container.use_target&&container.in_use)
             {
                 foreach(BaseEvent ev in container.events)
                 {
@@ -61,15 +66,6 @@ public class SceneDataViewer : DataViewer
                     {
                         Debug.LogWarning("Event discarded because there was no event_tracker attached to the target");
                     }
-
-
-                    //foreach (EventTracker tracker in trackers)
-                    //{
-                    //    if(ev.target_GUID == tracker.getGUID()) //there must be a better way to do this for sue
-                    //    {
-                    //        tracker.events.Add(ev);
-                    //    }
-                    //}
                 }
             }
         }
@@ -94,6 +90,14 @@ public class SceneDataViewer : DataViewer
             tracker.generateColor();
         }
     }
+
+    void sepparateEvents()
+    {
+        foreach (EventTracker tracker in trackers)
+        {
+            tracker.sepparateEvents();
+        }
+    }
     private void OnGUI()
     {
         setStyles();
@@ -107,6 +111,19 @@ public class SceneDataViewer : DataViewer
         {
             generateSceneView();
         }
+        DrawUILine(Color.white, 5, 20);
+
+        sepparated = EditorGUILayout.Toggle("View events sepparatedly", sepparated);
+
+        selection = EditorGUILayout.Toggle("View events only for selected GameObjects", selection);
+
+        yoffset = EditorGUILayout.FloatField("Y offset", yoffset);
+
+        y_multiplier = EditorGUILayout.FloatField("Y multiplier", y_multiplier);
+
+
+        size_multiplier = Mathf.Abs(EditorGUILayout.FloatField("Size multiplier", size_multiplier));
+
 
         DrawUILine(Color.white,5,20);
 
@@ -131,11 +148,22 @@ public class SceneDataViewer : DataViewer
         {
             if (!ev.empty)
             {
+                EditorGUILayout.BeginHorizontal();
+
+                EditorGUI.BeginChangeCheck();
                 ev.in_use = EditorGUILayout.Toggle("View " + ev.name, ev.in_use);
                 if (EditorGUI.EndChangeCheck())
                 {
-                   //do something
+                    generateSceneView();
                 }
+                EditorGUI.BeginChangeCheck();
+                ev.color = EditorGUILayout.ColorField(ev.name+"'s Color", ev.color);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    generateSceneView();
+                }
+                EditorGUILayout.EndHorizontal();
+                
             }
             else
             {

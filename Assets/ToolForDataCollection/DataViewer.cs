@@ -12,6 +12,7 @@ public class DataViewer : EditorWindow
 
     public bool modify_size = false;
     public float size_multiplier = 0;
+    public float yoffset = 10;
 
     public GUIStyle inspector_title = new GUIStyle();
     public GUIStyle text = new GUIStyle();
@@ -52,6 +53,21 @@ public class DataViewer : EditorWindow
             }
         }
         return false;
+    }
+
+    public Color getEventColor(string name)
+    {
+        Color ret = Color.black;
+
+        foreach(EventContainer tmp in events)
+        {
+            if(tmp.name == name)
+             {
+                Debug.Log("Name + Returnint : " + name+"   "+tmp.color);
+                return tmp.color;
+            }
+        }
+        return ret;
     }
 
     public static void DrawUILine(Color color, int thickness = 2, int padding = 10)
