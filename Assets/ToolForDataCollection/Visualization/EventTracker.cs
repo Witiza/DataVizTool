@@ -141,7 +141,6 @@ public class EventTracker : MonoBehaviour
                         pos = Vector3.zero;
                         pos.y = yoffset + parent.yoffset + (pair.Second*parent.y_multiplier * parent.size_multiplier) / 2;
                         pos.x = (-1 * parent.size_multiplier * sepparated_events.Count) / 2 + i * parent.size_multiplier;
-                        Debug.Log("SColor " + pair.First);
 
                         Gizmos.color = pair.First;
                         Gizmos.DrawCube(pos, scale);

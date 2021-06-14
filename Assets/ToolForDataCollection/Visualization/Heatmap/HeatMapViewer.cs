@@ -35,6 +35,9 @@ public class HeatMapViewer : DataViewer
     int x_cells;
     int z_cells;
     HeatCube[,] heatmap;
+    List<HeatCube> selected = new List<HeatCube>();
+    Dictionary<string, Pair<BaseEvent, int>> histogram = new Dictionary<string, Pair<BaseEvent, int>>();
+    int max_histogram = 0;
     HeatSelection selection;
     public HeatMapRenderer renderer;
     int selected_amount = 0;
@@ -113,6 +116,7 @@ public class HeatMapViewer : DataViewer
    
     public void adjoustmentsToCubes()
     {
+
         for (int i = 0; i < heatmap.GetLength(0); i++)
         {
             for (int j = 0; j < heatmap.GetLength(1); j++)
@@ -183,7 +187,10 @@ public class HeatMapViewer : DataViewer
                     }
                     if(heatmap[i,j].selected)
                     {
-                        selected_amount++;
+                       if(!selected.Contains(heatmap[i,j]))
+                       {
+                            selected.Add(heatmap[i, j]);
+                        }
                     }
                 }
             }
@@ -245,10 +252,53 @@ public class HeatMapViewer : DataViewer
 
     }
 
-
-    private void Update()
+    void generateDictionary()
     {
-
+        if(visualize_selection)
+        {
+            foreach(HeatCube cube in selected)
+            {
+                foreach(BaseEvent ev in cube.events)
+                {
+                    if(checkIfUsingEvent(ev.name))
+                    {
+                        if(histogram.ContainsKey(ev.name))
+                        {
+                            histogram[ev.name].Second++;
+                        }
+                        else
+                        {
+                            histogram.Add(ev.name, new Pair<BaseEvent, int>(ev, 1));
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            foreach(EventContainer cont in events)
+            {
+                if(!cont.empty && cont.in_use)
+                {
+                    if (histogram.ContainsKey(cont.name))
+                    {
+                        histogram[cont.name].Second++;
+                    }
+                    else
+                    {
+                        histogram.Add(cont.name, new Pair<BaseEvent, int>(cont.events[0], cont.events.Count));//Nasty
+                    }
+                }
+            }
+        }
+        max_histogram = 0;
+        foreach(var tmp in histogram)
+        {
+            if(tmp.Value.Second >max_histogram)
+            {
+                max_histogram = tmp.Value.Second;
+            }
+        }
     }
 
     private void OnEnable()
@@ -274,7 +324,14 @@ public class HeatMapViewer : DataViewer
 
         //doing this in update causes extreme lag bruv
         if (heatmap != null && selecting)
-           selection.SelectCubes(heatmap);
+        {
+            selection.SelectCubes(heatmap);
+            foreach(HeatCube cube in selected)
+            {
+                if (!cube.selected)
+                    selected.Remove(cube);
+            }
+        }
 
         if (selection != null)
         {
@@ -383,7 +440,20 @@ public class HeatMapViewer : DataViewer
         EditorGUILayout.LabelField("X cells: " + x_cells);
         EditorGUILayout.LabelField("Z cells: " + z_cells);
         EditorGUILayout.LabelField("Max events per cell: " + max_events);
+        if(GUILayout.Button("Generate Dictionary"))
+        {
+            generateDictionary();
+        }
 
+        foreach(var entry in histogram)
+        {
+            EditorGUILayout.LabelField(entry.Value.First.name + " amount: " + entry.Value.Second);
+        }
+
+        if(!visualize_selection)
+        {
+
+        }
         if(getEventHandler())
         {
             foreach(StandardEvent st_ev in event_handler.events)
