@@ -17,8 +17,8 @@ public class EventContainer
     public List<BaseEvent> events;
     public bool use_position;
     public bool use_target;
-    public bool empty = false;
-    public Color color;
+    public bool empty = true;
+    public Color color = Color.black;
 }
 public class BaseEvent
 {

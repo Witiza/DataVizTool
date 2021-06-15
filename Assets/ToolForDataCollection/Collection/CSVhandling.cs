@@ -110,12 +110,15 @@ public static  class CSVhandling
                     }
                     break;
             }
+            if(ret.events.Count >0)
+            {
+                ret.empty = false;
+            }
             file.Close();
         }
         else
         {
             Debug.Log("Unable to open: "+path);
-            ret.empty = true;
         }
         return ret;
     }

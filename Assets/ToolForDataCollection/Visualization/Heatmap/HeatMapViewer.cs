@@ -46,6 +46,7 @@ public class HeatMapViewer : DataViewer
     Mesh sphere = null;
     HeatCubeShape shape;
 
+    float m_Value;
 
 
     void Awake()
@@ -254,6 +255,7 @@ public class HeatMapViewer : DataViewer
 
     void generateDictionary()
     {
+        histogram.Clear();
         if(visualize_selection)
         {
             foreach(HeatCube cube in selected)
@@ -440,21 +442,27 @@ public class HeatMapViewer : DataViewer
         EditorGUILayout.LabelField("X cells: " + x_cells);
         EditorGUILayout.LabelField("Z cells: " + z_cells);
         EditorGUILayout.LabelField("Max events per cell: " + max_events);
-        if(GUILayout.Button("Generate Dictionary"))
+
+     
+
+        if (GUILayout.Button("Generate Dictionary"))
         {
             generateDictionary();
         }
 
         foreach(var entry in histogram)
         {
-            EditorGUILayout.LabelField(entry.Value.First.name + " amount: " + entry.Value.Second);
-        }
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(entry.Value.First.name + ": "+entry.Value.Second);
+            Rect r = EditorGUILayout.GetControlRect();
+            r.width = ((float)entry.Value.Second/(float)max_histogram)*(position.width *2/3);
+            r.x -= position.width / 4;
+            Debug.Log("Width: " + r.width);
 
-        if(!visualize_selection)
-        {
-
+            EditorGUI.DrawRect(r, getEventColor(entry.Value.First.name));
+            GUILayout.EndHorizontal();
         }
-        if(getEventHandler())
+        if (getEventHandler())
         {
             foreach(StandardEvent st_ev in event_handler.events)
             {
@@ -475,6 +483,8 @@ public class HeatMapViewer : DataViewer
         {
             if (!ev.empty)
             {
+                EditorGUILayout.BeginHorizontal();
+
                 EditorGUI.BeginChangeCheck();
                 ev.in_use = EditorGUILayout.Toggle("View " + ev.name, ev.in_use);
                 if (EditorGUI.EndChangeCheck())
@@ -482,12 +492,15 @@ public class HeatMapViewer : DataViewer
                     if (heatmap != null)
                         adjoustmentsToCubes();
                 }
+                ev.color = EditorGUILayout.ColorField(ev.name + "'s Color", ev.color);
+                EditorGUILayout.EndHorizontal();
             }
             else
             {
-                EditorGUILayout.LabelField("There is no CSV file for " + ev.name);
+               Debug.LogWarning("There is no CSV file for " + ev.name);
             }
         }
+    
     }
 
     bool checkIfLoaded(StandardEvent ev)
