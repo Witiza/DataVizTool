@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class DataViewer : EditorWindow
+public class SDV : EditorWindow
 {
-   public EventHandler event_handler = null;
-    public List<EventContainer> events = new List<EventContainer>();
+   public SDVEventHandler event_handler = null;
+    public List<SDVEventContainer> events = new List<SDVEventContainer>();
     public int max_events = 0;
     public Gradient gradient = new Gradient();
 
@@ -16,12 +16,13 @@ public class DataViewer : EditorWindow
 
     public GUIStyle inspector_title = new GUIStyle();
     public GUIStyle text = new GUIStyle();
+    public Color line_color;
 
     public bool getEventHandler()
     {
         if (event_handler == null)
         {
-            if (!(event_handler = GameObject.FindObjectOfType<EventHandler>()))
+            if (!(event_handler = GameObject.FindObjectOfType<SDVEventHandler>()))
             {
                 Debug.LogError("There is no EventHandler component in the scene");
                 return false;
@@ -34,6 +35,7 @@ public class DataViewer : EditorWindow
 
     public void setStyles()
     {
+        line_color = Color.gray;
         inspector_title.fontSize = 20;
         inspector_title.normal.textColor = Color.white;
         inspector_title.alignment = TextAnchor.MiddleCenter;
@@ -42,7 +44,7 @@ public class DataViewer : EditorWindow
     public bool checkIfUsingEvent(string name)
     {
 
-        foreach (EventContainer tmp in events)
+        foreach (SDVEventContainer tmp in events)
         {
             if (tmp.name == name)
             {
@@ -59,7 +61,7 @@ public class DataViewer : EditorWindow
     {
         Color ret = Color.black;
 
-        foreach(EventContainer tmp in events)
+        foreach(SDVEventContainer tmp in events)
         {
             if(tmp.name == name)
              {
@@ -70,13 +72,13 @@ public class DataViewer : EditorWindow
         return ret;
     }
 
-    public static void DrawUILine(Color color, int thickness = 2, int padding = 10)
+    public static void DrawUILine(int thickness = 2, int padding = 10)
     {
         Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
         r.height = thickness;
         r.y += padding / 2;
         r.x -= 2;
         r.width += 6;
-        EditorGUI.DrawRect(r, color);
+        EditorGUI.DrawRect(r, Color.gray);
     }
 }

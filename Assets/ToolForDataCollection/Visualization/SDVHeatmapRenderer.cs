@@ -4,18 +4,20 @@ using UnityEngine;
 using UnityEditor;
 
 [ExecuteInEditMode]
-public class HeatMapRenderer : MonoBehaviour
+public class SDVHeatmapRenderer : MonoBehaviour
 {
     Vector3 initial_pos;
     Vector3 final_pos;
 
     [HideInInspector]
-    public HeatMapViewer heatmap;
+    public SDVHeatmap heatmap;
+
+    public Color SelectionColor = Color.black;
 
 
     void Start()
     {
-        heatmap = EditorWindow.GetWindow<HeatMapViewer>();
+        heatmap = EditorWindow.GetWindow<SDVHeatmap>();
     }
 
 
@@ -34,6 +36,8 @@ public class HeatMapRenderer : MonoBehaviour
                 Vector3 center = (final_pos + initial_pos) / 2;
                 if (center.magnitude > 0.1)
                 {
+                    SelectionColor.a = 0.3f;
+                    Gizmos.color = SelectionColor;
                     Gizmos.DrawCube(center, (final_pos - initial_pos));
                 }
             }
@@ -41,9 +45,9 @@ public class HeatMapRenderer : MonoBehaviour
         else
         {
             //We dont want to open a new one always, we just want to get the reference if the window is open
-           if(EditorWindow.HasOpenInstances<HeatMapViewer>())
+           if(EditorWindow.HasOpenInstances<SDVHeatmap>())
             {
-                heatmap=EditorWindow.GetWindow<HeatMapViewer>();
+                heatmap=EditorWindow.GetWindow<SDVHeatmap>();
             }
         }
     }

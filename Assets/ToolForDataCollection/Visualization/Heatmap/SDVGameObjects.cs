@@ -4,18 +4,18 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
 
-public class SceneDataViewer : DataViewer
+public class SDVGameObjects : SDV
 {
     //This two go together
     [MenuItem("Window/Tool/DataViz/SceneData")]
     static void Init()
     {
-        SceneDataViewer window = (SceneDataViewer)EditorWindow.GetWindow(typeof(SceneDataViewer));
+        SDVGameObjects window = (SDVGameObjects)EditorWindow.GetWindow(typeof(SDVGameObjects));
         window.Show();
     }
 
 
-    List<EventTracker> trackers = new List<EventTracker>();
+    List<SDVEventTracker> trackers = new List<SDVEventTracker>();
     bool generated;
     public float y_multiplier = 1;
     public bool sepparated;
@@ -32,7 +32,7 @@ public class SceneDataViewer : DataViewer
     void Awake()
     {
         getEventHandler();
-        trackers = new List<EventTracker>(GameObject.FindObjectsOfType<EventTracker>());
+        trackers = new List<SDVEventTracker>(GameObject.FindObjectsOfType<SDVEventTracker>());
         if(trackers.Count<=0)
         {
             Debug.LogWarning("Tyring to visualize events in the scene without any EventTracker");
@@ -42,7 +42,7 @@ public class SceneDataViewer : DataViewer
 
     void cleanTrackers()
     {
-        foreach(EventTracker tracker in trackers)
+        foreach(SDVEventTracker tracker in trackers)
         {
             tracker.events.Clear();
             tracker.sepparated_events.Clear();
@@ -50,14 +50,14 @@ public class SceneDataViewer : DataViewer
     }
     void assignEvents()
     {
-        foreach(EventContainer container in events)
+        foreach(SDVEventContainer container in events)
         {
             
             if(container.use_target&&container.in_use)
             {
-                foreach(BaseEvent ev in container.events)
+                foreach(SDVBaseEvent ev in container.events)
                 {
-                    EventTracker tracker = ev.target_go.GetComponent<EventTracker>();
+                    SDVEventTracker tracker = ev.target_go.GetComponent<SDVEventTracker>();
                     if(tracker)
                     {
                         tracker.events.Add(ev);
@@ -73,7 +73,7 @@ public class SceneDataViewer : DataViewer
 
     void generateMaxEvents()
     {
-        foreach(EventTracker tracker in trackers)
+        foreach(SDVEventTracker tracker in trackers)
         {
             if(tracker.events.Count > max_events)
             {
@@ -85,7 +85,7 @@ public class SceneDataViewer : DataViewer
 
     void generateColors()
     {
-        foreach (EventTracker tracker in trackers)
+        foreach (SDVEventTracker tracker in trackers)
         {
             tracker.generateColor();
         }
@@ -93,7 +93,7 @@ public class SceneDataViewer : DataViewer
 
     void sepparateEvents()
     {
-        foreach (EventTracker tracker in trackers)
+        foreach (SDVEventTracker tracker in trackers)
         {
             tracker.sepparateEvents();
         }
@@ -105,13 +105,13 @@ public class SceneDataViewer : DataViewer
 
         gradient = EditorGUILayout.GradientField("Color: ", gradient);
 
-        DrawUILine(Color.white,5,20);
+        DrawUILine(5,20);
 
         if (GUILayout.Button("Distribute Events"))
         {
             generateSceneView();
         }
-        DrawUILine(Color.white, 5, 20);
+        DrawUILine(5, 20);
 
         sepparated = EditorGUILayout.Toggle("View events sepparatedly", sepparated);
 
@@ -125,7 +125,7 @@ public class SceneDataViewer : DataViewer
         size_multiplier = Mathf.Abs(EditorGUILayout.FloatField("Size multiplier", size_multiplier));
 
 
-        DrawUILine(Color.white,5,20);
+        DrawUILine(5,20);
 
         if (getEventHandler())
         {
@@ -135,7 +135,7 @@ public class SceneDataViewer : DataViewer
                 {
                     if (GUILayout.Button("Load " + st_ev.name + " Events"))
                     {
-                        events.Add(CSVhandling.LoadCSV(st_ev.name, SceneManager.GetActiveScene().name, CSVhandling.dataTypeToString(st_ev.data_type)));
+                        events.Add(SDVCSVhandling.LoadCSV(st_ev.name, SceneManager.GetActiveScene().name, SDVCSVhandling.dataTypeToString(st_ev.data_type)));
                     }
                 }
             }
@@ -144,7 +144,7 @@ public class SceneDataViewer : DataViewer
         {
             Debug.LogError("No EventHandler in the Scene");
         }
-        foreach (EventContainer ev in events)
+        foreach (SDVEventContainer ev in events)
         {
             if (!ev.empty)
             {
@@ -175,7 +175,7 @@ public class SceneDataViewer : DataViewer
     bool checkIfLoaded(StandardEvent ev)
     {
         bool ret = false;
-        foreach (EventContainer tmp in events)
+        foreach (SDVEventContainer tmp in events)
         {
             if (tmp.name == ev.name)
             {

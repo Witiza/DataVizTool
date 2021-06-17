@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 [ExecuteInEditMode]
-public class EventTracker : MonoBehaviour
+public class SDVEventTracker : MonoBehaviour
 {
     // Start is called before the first frame update
 
     string GUID = "";
-    public List<BaseEvent> events = new List<BaseEvent>();
+    public List<SDVBaseEvent> events = new List<SDVBaseEvent>();
 
-    SceneDataViewer parent =null;
+    SDVGameObjects parent =null;
     float alpha;
     Color color;
     public float yoffset;
@@ -33,7 +33,7 @@ public class EventTracker : MonoBehaviour
     {
         if(parent == null)
         {
-            parent = EditorWindow.GetWindow<SceneDataViewer>();
+            parent = EditorWindow.GetWindow<SDVGameObjects>();
 
         }
     }
@@ -56,7 +56,7 @@ public class EventTracker : MonoBehaviour
         if (parent)
         {
             int count = 0;
-            foreach (BaseEvent ev in events)
+            foreach (SDVBaseEvent ev in events)
             {
                 if (parent.checkIfUsingEvent(ev.name))
                 {
@@ -88,7 +88,7 @@ public class EventTracker : MonoBehaviour
 
     public void sepparateEvents()
     {
-        foreach(BaseEvent ev in events)
+        foreach(SDVBaseEvent ev in events)
         {
             if(sepparated_events.ContainsKey(ev.name))
             {

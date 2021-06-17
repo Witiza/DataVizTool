@@ -24,7 +24,7 @@ public enum DataType
     VECTOR3
 };
 
-public class EventHandler : MonoBehaviour
+public class SDVEventHandler : MonoBehaviour
 {
     public List<StandardEvent> events = new List<StandardEvent>();
 
@@ -34,7 +34,7 @@ public class EventHandler : MonoBehaviour
         LoadEditorEvents();
         for (int i = 0; i < events.Count; i++)
         {
-            events[i].ingame_events = new List<BaseEvent>();
+            events[i].ingame_events = new List<SDVBaseEvent>();
         }
     }
 
@@ -45,7 +45,7 @@ public class EventHandler : MonoBehaviour
         {
             for (int i = 0; i < events.Count; i++)
             {
-                CSVhandling.SaveToCSV(events[i],SceneManager.GetActiveScene().name);
+                SDVCSVhandling.SaveToCSV(events[i],SceneManager.GetActiveScene().name);
             }
         }
     }
@@ -120,8 +120,8 @@ public class EventHandler : MonoBehaviour
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
 
-        EventHandler tmp;
-        if (tmp=  (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        SDVEventHandler tmp;
+        if (tmp=  (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
         {
                tmp.StoreEvent(event_name, data,pos,target);
         }
@@ -133,8 +133,8 @@ public class EventHandler : MonoBehaviour
     static public void StoreEventStatic(string event_name, int data, Vector3? pos = null, GameObject target = null)
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        EventHandler tmp;
-        if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        SDVEventHandler tmp;
+        if (tmp = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
         {
            tmp.StoreEvent(event_name, data, pos,target);  
         }
@@ -146,8 +146,8 @@ public class EventHandler : MonoBehaviour
     static public void StoreEventStatic(string event_name, float data, Vector3? pos = null, GameObject target = null)
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        EventHandler tmp;
-        if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        SDVEventHandler tmp;
+        if (tmp = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
         {
 
             tmp.StoreEvent(event_name, data, pos,target);
@@ -162,8 +162,8 @@ public class EventHandler : MonoBehaviour
     static public void StoreEventStatic(string event_name, string data, Vector3? pos = null, GameObject target = null)
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        EventHandler tmp;
-        if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        SDVEventHandler tmp;
+        if (tmp = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
         {
 
             tmp.StoreEvent(event_name, data, pos, target);
@@ -177,8 +177,8 @@ public class EventHandler : MonoBehaviour
     static public void StoreEventStatic(string event_name, Vector3 data, Vector3? pos = null, GameObject target = null)
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        EventHandler tmp;
-        if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        SDVEventHandler tmp;
+        if (tmp = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
         {
 
             tmp.StoreEvent(event_name, data, pos,target);
@@ -192,8 +192,8 @@ public class EventHandler : MonoBehaviour
     static public void StoreEventStatic(string event_name, Vector3? pos = null, GameObject target = null)
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        EventHandler tmp;
-        if (tmp = (EventHandler)FindObjectOfType(typeof(EventHandler)))
+        SDVEventHandler tmp;
+        if (tmp = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
         {
 
             tmp.StoreEvent(event_name, pos, target);
@@ -339,11 +339,11 @@ public class EventHandler : MonoBehaviour
 
 
 
-[CustomEditor(typeof(EventHandler))]
+[CustomEditor(typeof(SDVEventHandler))]
 [CanEditMultipleObjects]
 public class EventHandlerEditor : Editor
 {
-    EventHandler handler;
+    SDVEventHandler handler;
     List<bool> foldouts = new List<bool>();
     bool loaded_events = false;
 
@@ -361,7 +361,7 @@ public class EventHandlerEditor : Editor
         setStyles();
         if (!Application.isPlaying)
         {
-            handler = (EventHandler)target;
+            handler = (SDVEventHandler)target;
             if (!loaded_events)
             {
                 handler.LoadEditorEvents();
@@ -520,7 +520,7 @@ public class StandardEvent
     [System.NonSerialized]
     Vector3 position;
    [System.NonSerialized]
-    public List<BaseEvent> ingame_events;
+    public List<SDVBaseEvent> ingame_events;
     public DataEventType type;
     public DataType data_type;
     public bool use_frequency = false;
@@ -553,40 +553,40 @@ public class StandardEvent
        // generateID();
         type =DataEventType.NO_TARGET;
         data_type = DataType.INT;
-        ingame_events = new List<BaseEvent>();
+        ingame_events = new List<SDVBaseEvent>();
       //  scene = SceneManager.GetActiveScene().name;
     }
 
     public void StoreEvent(bool ev, Vector3? pos = null, GameObject target = null)
     {
 
-        BoolEvent tmp = new BoolEvent(ev,name,playerID,sessionID,pos,target);
+        SDVBoolEvent tmp = new SDVBoolEvent(ev,name,playerID,sessionID,pos,target);
         ingame_events.Add(tmp);
     }
     public void StoreEvent(int ev, Vector3? pos = null, GameObject target = null)
     {
-        IntEvent tmp = new IntEvent(ev, name, playerID, sessionID,pos, target);
+        SDVIntEvent tmp = new SDVIntEvent(ev, name, playerID, sessionID,pos, target);
         ingame_events.Add(tmp);
     }
     public void StoreEvent(float ev, Vector3? pos = null, GameObject target = null)
     {
-        FloatEvent tmp = new FloatEvent(ev, name, playerID, sessionID,pos, target);
+        SDVFloatEvent tmp = new SDVFloatEvent(ev, name, playerID, sessionID,pos, target);
         ingame_events.Add(tmp);
     }
     public void StoreEvent(string ev, Vector3? pos = null, GameObject target = null)
     {
-        StringEvent tmp = new StringEvent(ev, name, playerID, sessionID, pos, target);
+        SDVStringEvent tmp = new SDVStringEvent(ev, name, playerID, sessionID, pos, target);
         ingame_events.Add(tmp);
     }
     public void StoreEvent(Vector3 ev, Vector3? pos = null, GameObject target = null)
     {
-        Vector3Event tmp = new Vector3Event(ev, name, playerID, sessionID, pos, target);
+        SDVVector3Event tmp = new SDVVector3Event(ev, name, playerID, sessionID, pos, target);
 
         ingame_events.Add(tmp);
     }
     public void StoreEvent(Vector3? pos=null, GameObject target = null)
     {
-        BaseEvent tmp = new BaseEvent(name, playerID, sessionID, pos, target);
+        SDVBaseEvent tmp = new SDVBaseEvent(name, playerID, sessionID, pos, target);
         ingame_events.Add(tmp);
     }
     void generateID()

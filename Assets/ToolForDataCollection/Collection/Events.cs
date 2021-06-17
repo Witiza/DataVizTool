@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-public class EventContainer
+public class SDVEventContainer
 {
-    public EventContainer(string _name)
+    public SDVEventContainer(string _name)
     {
         name = _name;
-        events = new List<BaseEvent>();
+        events = new List<SDVBaseEvent>();
     }
     public bool in_use = true;
     public string name;
     public DataType data_type;
     public DataEventType type;
-    public List<BaseEvent> events;
+    public List<SDVBaseEvent> events;
     public bool use_position;
     public bool use_target;
     public bool empty = true;
     public Color color = Color.black;
 }
-public class BaseEvent
+public class SDVBaseEvent
 {
     public string name;
     int playerID;
@@ -32,7 +32,7 @@ public class BaseEvent
     public string target_GUID = "";
     public string target_name="";
 
-    public BaseEvent(string _name,int player_id, int session_id, Vector3? pos, GameObject _target)
+    public SDVBaseEvent(string _name,int player_id, int session_id, Vector3? pos, GameObject _target)
     {
         name = _name;
         playerID = player_id;
@@ -45,7 +45,7 @@ public class BaseEvent
         }
         if (_target != null)
         {
-            EventTracker tmp = _target.GetComponent<EventTracker>();
+            SDVEventTracker tmp = _target.GetComponent<SDVEventTracker>();
             //   Debug.Log(tmp.gameObject.name);
             if (tmp != null)
             {
@@ -64,7 +64,7 @@ public class BaseEvent
 
     }
 
-    public BaseEvent(string line, string _name, bool use_position, bool use_target)
+    public SDVBaseEvent(string line, string _name, bool use_position, bool use_target)
     {
         name = _name;
         int start = 0;
@@ -103,7 +103,7 @@ public class BaseEvent
             if (subline[subline.Length-1] == '-')
             {
                 target_GUID = subline;
-                target_go = CSVhandling.getGameObject(target_GUID);
+                target_go = SDVCSVhandling.getGameObject(target_GUID);
             }
             else
             {
@@ -139,15 +139,15 @@ public class BaseEvent
     }
 };
 
-class BoolEvent : BaseEvent
+class SDVBoolEvent : SDVBaseEvent
 {
     public bool data;
-    public BoolEvent(bool ev, string _name, int player_id, int session_id, Vector3? pos, GameObject target) :base(_name,player_id,session_id,pos,target)
+    public SDVBoolEvent(bool ev, string _name, int player_id, int session_id, Vector3? pos, GameObject target) :base(_name,player_id,session_id,pos,target)
     {
         data = ev;
     }
 
-    public BoolEvent(string line, string _name,bool use_position, bool use_target) :base(line,_name,  use_position, use_target)
+    public SDVBoolEvent(string line, string _name,bool use_position, bool use_target) :base(line,_name,  use_position, use_target)
     {
         data = bool.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -158,14 +158,14 @@ class BoolEvent : BaseEvent
     }
 };
 
-class IntEvent : BaseEvent
+class SDVIntEvent : SDVBaseEvent
 {
     public int data;
-    public IntEvent(int ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
+    public SDVIntEvent(int ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
     {
         data = ev;
     }
-    public IntEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
+    public SDVIntEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
     {
         data = int.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -176,14 +176,14 @@ class IntEvent : BaseEvent
     }
 };
 
-class FloatEvent : BaseEvent
+class SDVFloatEvent : SDVBaseEvent
 {
     public float data;
-    public FloatEvent(float ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
+    public SDVFloatEvent(float ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
     {
         data = ev;
     }
-    public FloatEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
+    public SDVFloatEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
     {
         data = float.Parse(line.Substring(line.LastIndexOf(',') + 1));
     }
@@ -193,15 +193,15 @@ class FloatEvent : BaseEvent
         file.Write(data);
     }
 };
-class StringEvent : BaseEvent
+class SDVStringEvent : SDVBaseEvent
 {
     
     public string data;
-    public StringEvent(string ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos,target)
+    public SDVStringEvent(string ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos,target)
     {
         data = ev;
     }
-    public StringEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
+    public SDVStringEvent(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
     {
         data = line.Substring(line.LastIndexOf(',') + 1);
     }
@@ -211,15 +211,15 @@ class StringEvent : BaseEvent
         file.Write(data);
     }
 };
-public class Vector3Event : BaseEvent
+public class SDVVector3Event : SDVBaseEvent
 {
     public Vector3 data;
-    public Vector3Event(Vector3 ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
+    public SDVVector3Event(Vector3 ev, string _name, int player_id, int session_id, Vector3? pos = null, GameObject target = null) : base(_name, player_id, session_id, pos, target)
     {
         data = ev;
     }
 
-    public Vector3Event(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
+    public SDVVector3Event(string line, string _name, bool use_position, bool use_target) : base(line, _name, use_position, use_target)
     {
 
         data = new Vector3();

@@ -10,9 +10,9 @@ public  class HeatSelection
     Vector3 initial_pos = Vector3.one;
     Vector3 final_pos = Vector3.zero;
     Mesh mesh;
-   public HeatMapViewer heatmap;
+   public SDVHeatmap heatmap;
 
-    public HeatSelection(HeatMapViewer parent)
+    public HeatSelection(SDVHeatmap parent)
     {
         heatmap = parent;
     }
@@ -93,7 +93,7 @@ public  class HeatSelection
         }
     }
 
-    public void SelectCubes(HeatCube[,] heatmap)
+    public void SelectCubes(SDVHeatCube[,] heatmap)
     {
 
 

@@ -32,7 +32,7 @@ public class SimpleMove : MonoBehaviour
             hp -= 1;
         if(hp<=0)
         {
-            EventHandler.StoreEventStatic("TST_death","Uded");
+            SDVEventHandler.StoreEventStatic("TST_death","Uded");
         }
     }
 }

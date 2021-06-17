@@ -155,7 +155,7 @@ namespace Gamekit3D
 
         void Start()
         {
-            EventHandler.StoreEventStatic("Start", true);
+            SDVEventHandler.StoreEventStatic("Start", true);
         }
         // Called automatically by Unity after Awake whenever the script is enabled. 
         void OnEnable()

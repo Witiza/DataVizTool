@@ -10,13 +10,13 @@ public enum HeatCubeShape
     SPHERE
 };
 
-public class HeatMapViewer : DataViewer
+public class SDVHeatmap : SDV
 {
     //This two go together
     [MenuItem("Window/Tool/DataViz/HeatMap")]
     static void Init()
     {
-        HeatMapViewer window = (HeatMapViewer)EditorWindow.GetWindow(typeof(HeatMapViewer));
+        SDVHeatmap window = (SDVHeatmap)EditorWindow.GetWindow(typeof(SDVHeatmap));
         window.Show();
 
     }
@@ -34,33 +34,30 @@ public class HeatMapViewer : DataViewer
     float min_z = 0;
     int x_cells;
     int z_cells;
-    HeatCube[,] heatmap;
-    List<HeatCube> selected = new List<HeatCube>();
-    Dictionary<string, Pair<BaseEvent, int>> histogram = new Dictionary<string, Pair<BaseEvent, int>>();
+    SDVHeatCube[,] heatmap;
+    List<SDVHeatCube> selected = new List<SDVHeatCube>();
+    Dictionary<string, Pair<SDVBaseEvent, int>> histogram = new Dictionary<string, Pair<SDVBaseEvent, int>>();
     int max_histogram = 0;
     HeatSelection selection;
-    public HeatMapRenderer renderer;
+    public SDVHeatmapRenderer renderer;
     int selected_amount = 0;
 
     Mesh cube = null;
     Mesh sphere = null;
     HeatCubeShape shape;
 
-    float m_Value;
-
-
     void Awake()
     {
         getRenderer();
         getEventHandler();
         loadMeshes();
-      
+        selecting = false;
         selection = new HeatSelection(this);
     }
 
    public  void getRenderer()
     {
-        if ((renderer = GameObject.FindObjectOfType<HeatMapRenderer>()))
+        if ((renderer = GameObject.FindObjectOfType<SDVHeatmapRenderer>()))
         {
             renderer.heatmap = this;
         }
@@ -97,13 +94,13 @@ public class HeatMapViewer : DataViewer
         //cute +1
         x_cells = Mathf.CeilToInt(x_dist / cube_size) + 1;
         z_cells = Mathf.CeilToInt(z_dist / cube_size) + 1;
-        heatmap = new HeatCube[x_cells, z_cells];
+        heatmap = new SDVHeatCube[x_cells, z_cells];
 
         for (int i = 0; i < heatmap.GetLength(0); i++)
         {
             for (int j = 0; j < heatmap.GetLength(1); j++)
             {
-                heatmap[i, j] = new HeatCube(new Vector3(min_x + i * cube_size, 10, min_z + j * cube_size), new Vector3(cube_size, cube_size, cube_size), material, this);
+                heatmap[i, j] = new SDVHeatCube(new Vector3(min_x + i * cube_size, 10, min_z + j * cube_size), new Vector3(cube_size, cube_size, cube_size), material, this);
             }
         }
 
@@ -117,7 +114,7 @@ public class HeatMapViewer : DataViewer
    
     public void adjoustmentsToCubes()
     {
-
+        generateDictionary();
         for (int i = 0; i < heatmap.GetLength(0); i++)
         {
             for (int j = 0; j < heatmap.GetLength(1); j++)
@@ -132,10 +129,10 @@ public class HeatMapViewer : DataViewer
     }
     void calculateSize()
     {
-        foreach (EventContainer ev in events)
+        foreach (SDVEventContainer ev in events)
         {
 
-                foreach (BaseEvent tmp in ev.events)
+                foreach (SDVBaseEvent tmp in ev.events)
                 {
                     if (tmp.position.x < min_x)
                     {
@@ -201,7 +198,7 @@ public class HeatMapViewer : DataViewer
 
     void distributeEvents()
     {
-        foreach (EventContainer ev in events)
+        foreach (SDVEventContainer ev in events)
         {
             if (ev.use_position&&!ev.empty)
             {
@@ -241,10 +238,10 @@ public class HeatMapViewer : DataViewer
             }
         }
     }
-    void assignEvent(EventContainer ev)
+    void assignEvent(SDVEventContainer ev)
     {
 
-        foreach (BaseEvent tmp in ev.events)
+        foreach (SDVBaseEvent tmp in ev.events)
         {
             int x_pos = Mathf.FloorToInt(Mathf.Abs(tmp.position.x - min_x) / cube_size);
             int z_pos = Mathf.FloorToInt(Mathf.Abs(tmp.position.z - min_z) / cube_size);
@@ -258,9 +255,9 @@ public class HeatMapViewer : DataViewer
         histogram.Clear();
         if(visualize_selection)
         {
-            foreach(HeatCube cube in selected)
+            foreach(SDVHeatCube cube in selected)
             {
-                foreach(BaseEvent ev in cube.events)
+                foreach(SDVBaseEvent ev in cube.events)
                 {
                     if(checkIfUsingEvent(ev.name))
                     {
@@ -270,7 +267,7 @@ public class HeatMapViewer : DataViewer
                         }
                         else
                         {
-                            histogram.Add(ev.name, new Pair<BaseEvent, int>(ev, 1));
+                            histogram.Add(ev.name, new Pair<SDVBaseEvent, int>(ev, 1));
                         }
                     }
                 }
@@ -278,7 +275,7 @@ public class HeatMapViewer : DataViewer
         }
         else
         {
-            foreach(EventContainer cont in events)
+            foreach(SDVEventContainer cont in events)
             {
                 if(!cont.empty && cont.in_use)
                 {
@@ -288,7 +285,7 @@ public class HeatMapViewer : DataViewer
                     }
                     else
                     {
-                        histogram.Add(cont.name, new Pair<BaseEvent, int>(cont.events[0], cont.events.Count));//Nasty
+                        histogram.Add(cont.name, new Pair<SDVBaseEvent, int>(cont.events[0], cont.events.Count));//Nasty
                     }
                 }
             }
@@ -328,7 +325,7 @@ public class HeatMapViewer : DataViewer
         if (heatmap != null && selecting)
         {
             selection.SelectCubes(heatmap);
-            foreach(HeatCube cube in selected)
+            foreach(SDVHeatCube cube in selected)
             {
                 if (!cube.selected)
                     selected.Remove(cube);
@@ -368,18 +365,21 @@ public class HeatMapViewer : DataViewer
             EditorGUILayout.LabelField("No Events Loaded");
             GUI.enabled = false;
         }
+        GUILayout.BeginHorizontal();
         if (GUILayout.Button("Generate Heatmap"))
         {
 
             createHeatMap();
 
         }
-        GUI.enabled = true;
+
         if (GUILayout.Button("Delete Heatmap"))
         {
             deleteHeatmap();
         }
-
+        GUI.enabled = true;
+        GUILayout.EndHorizontal();
+        DrawUILine( 5, 20);
         EditorGUI.BeginChangeCheck();
         gradient = EditorGUILayout.GradientField("Color: ", gradient);
         if (EditorGUI.EndChangeCheck())
@@ -391,7 +391,8 @@ public class HeatMapViewer : DataViewer
 
         material = (Material)EditorGUILayout.ObjectField("Material: ",material, typeof(Material), true);
 
-        if(selecting)
+        DrawUILine(5, 20);
+        if (selecting)
         {
             if (GUILayout.Button("Stop HeatMap selection"))
             {
@@ -409,7 +410,7 @@ public class HeatMapViewer : DataViewer
         visualize_selection = EditorGUILayout.Toggle("Only Visualize Selection", visualize_selection);
         if (EditorGUI.EndChangeCheck())
         {
-            Debug.Log("swiiitchi"); 
+            generateDictionary();
             //THIS DOESNT WORK !!!!!!!!!!!!!!!!!!!!!!!!!!!!
            // 04/06 still does not work
            RenderHeatMap();
@@ -418,6 +419,7 @@ public class HeatMapViewer : DataViewer
             lastRenderedFrame = 0;
            // view.Repaint();
         }
+        DrawUILine(5, 20);
         shape = (HeatCubeShape)EditorGUILayout.EnumPopup("Heat Cubes Shape: ", shape);
 
 
@@ -437,17 +439,17 @@ public class HeatMapViewer : DataViewer
         {
             adjoustmentsToCubes();
         }
-
-            EditorGUILayout.LabelField("Selected Cubes: " + selected_amount);
+        DrawUILine(5, 20);
+        EditorGUILayout.LabelField("Selected Cubes: " + selected_amount);
         EditorGUILayout.LabelField("X cells: " + x_cells);
         EditorGUILayout.LabelField("Z cells: " + z_cells);
         EditorGUILayout.LabelField("Max events per cell: " + max_events);
 
-     
+        DrawUILine(5, 20);
 
-        if (GUILayout.Button("Generate Dictionary"))
+        if (histogram.Count ==0)
         {
-            generateDictionary();
+            EditorGUILayout.LabelField("No Heatmap Generated");
         }
 
         foreach(var entry in histogram)
@@ -462,6 +464,7 @@ public class HeatMapViewer : DataViewer
             EditorGUI.DrawRect(r, getEventColor(entry.Value.First.name));
             GUILayout.EndHorizontal();
         }
+        DrawUILine(5, 20);
         if (getEventHandler())
         {
             foreach(StandardEvent st_ev in event_handler.events)
@@ -470,7 +473,7 @@ public class HeatMapViewer : DataViewer
                 {
                     if(GUILayout.Button("Load "+st_ev.name+" Events"))
                     {
-                        events.Add(CSVhandling.LoadCSV(st_ev.name, SceneManager.GetActiveScene().name,CSVhandling.dataTypeToString(st_ev.data_type)));
+                        events.Add(SDVCSVhandling.LoadCSV(st_ev.name, SceneManager.GetActiveScene().name,SDVCSVhandling.dataTypeToString(st_ev.data_type)));
                     }
                 }
             }
@@ -479,7 +482,7 @@ public class HeatMapViewer : DataViewer
         {
             Debug.LogError("No EventHandler in the Scene");
         }
-        foreach (EventContainer ev in events)
+        foreach (SDVEventContainer ev in events)
         {
             if (!ev.empty)
             {
@@ -506,7 +509,7 @@ public class HeatMapViewer : DataViewer
     bool checkIfLoaded(StandardEvent ev)
     {
         bool ret = false;
-        foreach(EventContainer tmp in events)
+        foreach(SDVEventContainer tmp in events)
         {
             if(tmp.name == ev.name)
             {

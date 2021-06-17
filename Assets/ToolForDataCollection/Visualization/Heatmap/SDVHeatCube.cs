@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class HeatCube
+public class SDVHeatCube
 {
-    public List<BaseEvent> events = new List<BaseEvent>();
+    public List<SDVBaseEvent> events = new List<SDVBaseEvent>();
 
     public Material lineMaterial =null;
     Material mat;
     public int max_events;
     public float alpha = 0;
-    HeatMapViewer parent;
+    SDVHeatmap parent;
     public bool selected = false;
 
     int events_in_use = 0;
@@ -22,7 +22,7 @@ public class HeatCube
     Vector3 scale;
     Quaternion rotation;
 
-    public HeatCube(Vector3 _position,Vector3 _scale, Material material, HeatMapViewer map)
+    public SDVHeatCube(Vector3 _position,Vector3 _scale, Material material, SDVHeatmap map)
     {
         position = _position;
         rotation = Quaternion.identity;
@@ -37,7 +37,7 @@ public class HeatCube
     public int getEventAmount()
     {
         int ret = 0;
-        foreach(BaseEvent tmp in events)
+        foreach(SDVBaseEvent tmp in events)
         {
             if(parent.checkIfUsingEvent(tmp.name))
             {
@@ -71,7 +71,7 @@ public class HeatCube
     public void generateHeight()
     {
         float median_height = 0;
-        foreach(BaseEvent ev in events)
+        foreach(SDVBaseEvent ev in events)
         {
             median_height += ev.position.y;
         }
@@ -82,7 +82,7 @@ public class HeatCube
     public void generateEventsInUse()
     {
         events_in_use = 0;
-        foreach (BaseEvent ev in events)
+        foreach (SDVBaseEvent ev in events)
         {
             if (parent.checkIfUsingEvent(ev.name))
             {

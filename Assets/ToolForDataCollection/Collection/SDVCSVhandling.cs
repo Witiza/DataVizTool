@@ -5,7 +5,7 @@ using System.IO;
 using UnityEngine.SceneManagement;
 
 
-public static  class CSVhandling 
+public static  class SDVCSVhandling 
 {
     public static void SaveToCSV(StandardEvent events, string scene)
     {
@@ -49,9 +49,9 @@ public static  class CSVhandling
         file.Close();
     }
 
-    public static EventContainer LoadCSV(string name,string scene, string data_type)
+    public static SDVEventContainer LoadCSV(string name,string scene, string data_type)
     {
-        EventContainer ret = new EventContainer(name);
+        SDVEventContainer ret = new SDVEventContainer(name);
         string path = Application.persistentDataPath + "/events/";
         Directory.CreateDirectory(path);
         path += name + '-' + scene + '-'+data_type+".csv";
@@ -71,42 +71,42 @@ public static  class CSVhandling
                     ret.data_type = DataType.NULL;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new BaseEvent(line, name, ret.use_position, ret.use_target));
+                        ret.events.Add(new SDVBaseEvent(line, name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "BOOL":
                     ret.data_type = DataType.BOOL;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new BoolEvent(line,name,ret.use_position,ret.use_target));
+                        ret.events.Add(new SDVBoolEvent(line,name,ret.use_position,ret.use_target));
                      }
                     break;
                 case "INT":
                     ret.data_type = DataType.INT;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new IntEvent(line,name, ret.use_position, ret.use_target));
+                        ret.events.Add(new SDVIntEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "FLOAT":
                     ret.data_type = DataType.FLOAT;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new FloatEvent(line,name, ret.use_position, ret.use_target));
+                        ret.events.Add(new SDVFloatEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "STRING":
                     ret.data_type = DataType.STRING;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new StringEvent(line,name, ret.use_position, ret.use_target));
+                        ret.events.Add(new SDVStringEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "VECTOR3":
                     ret.data_type = DataType.VECTOR3;
                     while ((line = file.ReadLine()) != null)
                     {
-                        ret.events.Add(new Vector3Event(line,name, ret.use_position, ret.use_target ));
+                        ret.events.Add(new SDVVector3Event(line,name, ret.use_position, ret.use_target ));
                     }
                     break;
             }
@@ -123,9 +123,9 @@ public static  class CSVhandling
         return ret;
     }
 
-    static EventContainer readCSVMetadata(StreamReader file,EventContainer events)
+    static SDVEventContainer readCSVMetadata(StreamReader file,SDVEventContainer events)
     {
-        EventContainer ret = events;
+        SDVEventContainer ret = events;
         string line = file.ReadLine();
 
         int start = 0;
