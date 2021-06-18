@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEditor;
 [ExecuteInEditMode]
@@ -15,7 +16,7 @@ public class SDVEventTracker : MonoBehaviour
     Color color;
     public float yoffset;
 
-    public Dictionary<string, Pair<Color, int>> sepparated_events = new Dictionary<string, Pair<Color, int>>();
+    public Dictionary<string, SDVPair<Color, int>> sepparated_events = new Dictionary<string, SDVPair<Color, int>>();
  
 
     void Start()
@@ -97,7 +98,7 @@ public class SDVEventTracker : MonoBehaviour
             else
             {
                 Color color = parent.getEventColor(ev.name);
-                sepparated_events.Add(ev.name, new Pair<Color, int>(color, 1));
+                sepparated_events.Add(ev.name, new SDVPair<Color, int>(color, 1));
             }
         }
         Debug.Log(sepparated_events);
@@ -159,19 +160,20 @@ public class SDVEventTracker : MonoBehaviour
 }
 
 //https://stackoverflow.com/questions/569903/multi-value-dictionary
-public sealed class Pair<TFirst, TSecond>
+public class SDVPair<TFirst, TSecond>
 {
-    public Pair(TFirst first, TSecond second)
+    public SDVPair(TFirst first, TSecond second)
     {
         this.First = first;
         this.Second = second;
     }
 
+
     public TFirst First { get; set; }
 
     public TSecond Second { get; set; }
 
-    public bool Equals(Pair<TFirst, TSecond> other)
+    public bool Equals(SDVPair<TFirst, TSecond> other)
     {
         if (other == null)
         {
@@ -183,7 +185,7 @@ public sealed class Pair<TFirst, TSecond>
 
     public override bool Equals(object o)
     {
-        return Equals(o as Pair<TFirst, TSecond>);
+        return Equals(o as SDVPair<TFirst, TSecond>);
     }
 
     public override int GetHashCode()

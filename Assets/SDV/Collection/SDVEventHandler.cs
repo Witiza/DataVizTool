@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
@@ -273,19 +274,74 @@ public class SDVEventHandler : MonoBehaviour
         events.Add(tmp);
     }
 
+    SDVParentHelper generateActiveList()
+    {
+        SDVParentHelper ret = new SDVParentHelper();
+
+        foreach(StandardEvent ev in events)
+        {
+            ret.list.Add(new SDVHelper(ev.name,ev.active));
+        }
+        return ret;
+    }
+
+
+
     public void SaveEditorEvents()
     {
+    
+        SDVParentHelper actives = generateActiveList();
         string path = Application.persistentDataPath + "/EditorEvents/";
         Directory.CreateDirectory(path);
-        path += "Events.dta";
-        FileStream fs = new FileStream(path, FileMode.Create);
+
+        string path_evs = path+"Events.dta";
+        FileStream fs = new FileStream(path_evs, FileMode.Create);
         BinaryFormatter formatter = new BinaryFormatter();
         formatter.Serialize(fs, events);
         fs.Close();
+
+        string path_actives = path + SceneManager.GetActiveScene().name + ".aev";
+        fs = new FileStream(path_actives, FileMode.Create);
+        formatter = new BinaryFormatter();
+        formatter.Serialize(fs, actives);
+        fs.Close();
     }
 
-   public  void LoadEditorEvents()
+    void applyActiveList()
     {
+        SDVParentHelper ret = new SDVParentHelper();
+        string path = Application.persistentDataPath + "/EditorEvents/" + SceneManager.GetActiveScene().name + ".aev";
+        if (File.Exists(path))
+        {
+            Stream stream = File.OpenRead(path);
+            if (stream.Length > 0)
+            {
+                BinaryFormatter formater = new BinaryFormatter();
+                //var tst = formater.Deserialize(stream);
+                ret = (SDVParentHelper)formater.Deserialize(stream);
+            }
+            stream.Close();
+        }
+
+        foreach (StandardEvent ev in events)
+        {
+            foreach (var act in ret.list)
+            {
+                ev.active = false;
+                if (act.name == ev.name)
+                {
+                    Debug.Log("Name: " + act.name);
+                    Debug.Log("Value: " + act.active);
+                    ev.active = act.active;
+                    break;
+                }
+            }
+        }
+    }
+
+    public  void LoadEditorEvents()
+    {
+        Debug.Log("-------------------------LOADING EVENTS---------------------------");
         string path = Application.persistentDataPath + "/EditorEvents/Events.dta";
         if (File.Exists(path))
         {
@@ -293,15 +349,16 @@ public class SDVEventHandler : MonoBehaviour
             if (stream.Length > 0)
             {
                 BinaryFormatter formater = new BinaryFormatter();
+
                 events = (List<StandardEvent>)formater.Deserialize(stream);
             }
             stream.Close();
         }
+        applyActiveList();
         for(int i = 0;i<events.Count;i++)
         {
-            if(events[i].target_name != null&& events[i].target_name != "")
+            if(events[i].active && events[i].target_name != null&& events[i].target_name != "")
             {
-
                 if(!(events[i].target = GameObject.Find(events[i].target_name)))
                 {
                     //events[i].target = CSVhandling.getGameObject(events[i].target_GUID);
@@ -315,7 +372,6 @@ public class SDVEventHandler : MonoBehaviour
                 {
                     if (events[i].type != DataEventType.POSITION)
                     {
-                        Debug.Log("start");
                         var component = events[i].target.GetComponent(events[i].script_name);
                         if (component)
                         {
@@ -507,7 +563,7 @@ public class EventHandlerEditor : Editor
 [System.Serializable]
 public class StandardEvent
 {
-    public bool active = true;
+    public bool active = false;
     public float interval = 1;
     public float current_interval = 0;
     uint eventID = 0;
@@ -591,6 +647,24 @@ public class StandardEvent
     }
     void generateID()
     {
-        eventID = (uint)Random.Range(1, 999); //TEMPORARY
+        eventID = (uint)UnityEngine.Random.Range(1, 999); //TEMPORARY
     }
+}
+
+[Serializable]
+public class SDVHelper
+{
+    public SDVHelper(string _name, bool _active)
+    {
+        name = _name;
+        active = _active;
+    }
+
+    public string name;
+    public bool active;
+}
+[Serializable]
+public class SDVParentHelper
+{
+    public List<SDVHelper> list = new List<SDVHelper>();
 }

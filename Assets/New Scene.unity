@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -123,6 +123,89 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &680798572
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 680798574}
+  - component: {fileID: 680798573}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &680798573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 680798572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c0297225fac50e44938c52ccc2b62e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  events:
+  - active: 0
+    interval: 0.1
+    current_interval: 0.023688301
+    name: TST_position
+    target_name: Cube
+    target_GUID: 
+    type: 0
+    data_type: 0
+    use_frequency: 1
+    save_position: 1
+    use_target: 1
+    script_name: script name
+    variable_name: variable name
+  - active: 0
+    interval: 1
+    current_interval: 0.14764091
+    name: TST_hp
+    target_name: Cube
+    target_GUID: 
+    type: 3
+    data_type: 0
+    use_frequency: 1
+    save_position: 0
+    use_target: 1
+    script_name: SimpleMove
+    variable_name: hp
+  - active: 0
+    interval: 1
+    current_interval: 0
+    name: TST_death
+    target_name: 
+    target_GUID: 
+    type: 2
+    data_type: 4
+    use_frequency: 0
+    save_position: 0
+    use_target: 0
+    script_name: script name
+    variable_name: variable name
+--- !u!4 &680798574
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 680798572}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1360964270
 GameObject:
   m_ObjectHideFlags: 0
@@ -199,6 +282,7 @@ Light:
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &1360964272

@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class SDVGameObjects : SDV
 {
     //This two go together
-    [MenuItem("Window/Tool/DataViz/SceneData")]
+    [MenuItem("Window/SDV/SceneData")]
     static void Init()
     {
         SDVGameObjects window = (SDVGameObjects)EditorWindow.GetWindow(typeof(SDVGameObjects));

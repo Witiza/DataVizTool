@@ -13,12 +13,11 @@ public enum HeatCubeShape
 public class SDVHeatmap : SDV
 {
     //This two go together
-    [MenuItem("Window/Tool/DataViz/HeatMap")]
+    [MenuItem("Window/SDV/HeatMap")]
     static void Init()
     {
         SDVHeatmap window = (SDVHeatmap)EditorWindow.GetWindow(typeof(SDVHeatmap));
         window.Show();
-
     }
 
     int lastRenderedFrame = 0;
@@ -36,7 +35,7 @@ public class SDVHeatmap : SDV
     int z_cells;
     SDVHeatCube[,] heatmap;
     List<SDVHeatCube> selected = new List<SDVHeatCube>();
-    Dictionary<string, Pair<SDVBaseEvent, int>> histogram = new Dictionary<string, Pair<SDVBaseEvent, int>>();
+    Dictionary<string, SDVPair<SDVBaseEvent, int>> histogram = new Dictionary<string, SDVPair<SDVBaseEvent, int>>();
     int max_histogram = 0;
     HeatSelection selection;
     public SDVHeatmapRenderer renderer;
@@ -267,7 +266,7 @@ public class SDVHeatmap : SDV
                         }
                         else
                         {
-                            histogram.Add(ev.name, new Pair<SDVBaseEvent, int>(ev, 1));
+                            histogram.Add(ev.name, new SDVPair<SDVBaseEvent, int>(ev, 1));
                         }
                     }
                 }
@@ -285,7 +284,7 @@ public class SDVHeatmap : SDV
                     }
                     else
                     {
-                        histogram.Add(cont.name, new Pair<SDVBaseEvent, int>(cont.events[0], cont.events.Count));//Nasty
+                        histogram.Add(cont.name, new SDVPair<SDVBaseEvent, int>(cont.events[0], cont.events.Count));//Nasty
                     }
                 }
             }
