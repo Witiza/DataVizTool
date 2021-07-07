@@ -3,7 +3,12 @@
  
  ## How to Use
  
+ Open the Unity project where you want to use the tool, and drop the unitypackage from the lastest release.
  To try the Tool without having to create a videogame, we recommend you open the ExampleScene.
+ - SDV
+ 
+ In order to use the tool, each GameObject that the user wants to track, will need to have an SDVEventTracker component
+ 
  
  - EventHandler
   
