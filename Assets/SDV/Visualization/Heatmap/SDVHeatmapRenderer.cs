@@ -31,6 +31,7 @@ public class SDVHeatmapRenderer : MonoBehaviour
     {
         if (heatmap != null)
         {
+            //heatmap.RenderGizmos();
             if (heatmap.selecting)
             {
                 Vector3 center = (final_pos + initial_pos) / 2;

@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimpleMove : MonoBehaviour
+public class SDVExampleController : MonoBehaviour
 {
-    float speed = 50f;
+    float speed = 1000f;
     [SerializeField]
     int hp = 10;
     Rigidbody rb;
@@ -18,13 +18,14 @@ public class SimpleMove : MonoBehaviour
 
     void FixedUpdate()
     {
-        // rb.velocity = Vector3.zero;
+         rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         if (Input.GetKey(KeyCode.W))
-            rb.AddForce(transform.forward * Time.deltaTime * speed);
+            rb.velocity = transform.forward * Time.deltaTime * speed;
             //transform.Translate(Vector3.forward * Time.deltaTime * speed);
 
         if (Input.GetKey(KeyCode.S))
-            rb.AddForce(transform.forward * Time.deltaTime * speed);
+            rb.velocity = transform.forward * Time.deltaTime * speed;
 
 
         // transform.Translate(-1 * Vector3.forward * Time.deltaTime * speed);
@@ -42,4 +43,22 @@ public class SimpleMove : MonoBehaviour
             SDVEventHandler.StoreEventStatic("TST_death","Uded");
         }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.collider.name == "Pole")
+        {
+            SDVEventHandler.StoreEventStatic("SDVMultiTargeted", collision.collider.transform.position, collision.collider.gameObject);
+        }
+    }
+    private void OnCollisionStay(Collision collision)
+    {
+
+            if (collision.collider.name == "Pole")
+            {
+               SDVEventHandler.StoreEventStatic("SDVMultiTargetedTwo", collision.collider.transform.position, collision.collider.gameObject);
+            }
+        
+    }
+
 }

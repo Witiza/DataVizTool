@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class SDVGameObjects : SDV
 {
     //This two go together
-    [MenuItem("Window/SDV/SceneData")]
+    [MenuItem("Window/SDV/GameObjects")]
     static void Init()
     {
         SDVGameObjects window = (SDVGameObjects)EditorWindow.GetWindow(typeof(SDVGameObjects));
@@ -23,6 +23,8 @@ public class SDVGameObjects : SDV
 
     void generateSceneView()
     {
+        getEventHandler();
+        getTrackers();
         cleanTrackers();
         assignEvents();
         generateMaxEvents();
@@ -32,14 +34,17 @@ public class SDVGameObjects : SDV
     void Awake()
     {
         getEventHandler();
+        getTrackers();
+        generated = false;
+    }
+    void getTrackers()
+    {
         trackers = new List<SDVEventTracker>(GameObject.FindObjectsOfType<SDVEventTracker>());
-        if(trackers.Count<=0)
+        if (trackers.Count <= 0)
         {
             Debug.LogWarning("Tyring to visualize events in the scene without any EventTracker");
         }
-        generated = false;
     }
-
     void cleanTrackers()
     {
         foreach(SDVEventTracker tracker in trackers)
@@ -113,9 +118,9 @@ public class SDVGameObjects : SDV
         }
         DrawUILine(5, 20);
 
-        sepparated = EditorGUILayout.Toggle("View events sepparatedly", sepparated);
+        sepparated = EditorGUILayout.Toggle("View events separatedly", sepparated);
 
-        selection = EditorGUILayout.Toggle("View events only for selected GameObjects", selection);
+        selection = EditorGUILayout.Toggle("View  selected GameObjects", selection);
 
         yoffset = EditorGUILayout.FloatField("Y offset", yoffset);
 

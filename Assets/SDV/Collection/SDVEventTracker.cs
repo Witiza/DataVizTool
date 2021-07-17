@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEditor;
+
 [ExecuteInEditMode]
 public class SDVEventTracker : MonoBehaviour
 {
-    // Start is called before the first frame update
 
     string GUID = "";
     public List<SDVBaseEvent> events = new List<SDVBaseEvent>();
 
-    SDVGameObjects parent =null;
+    [HideInInspector]
+    public SDVGameObjects parent =null;
     float alpha;
     Color color;
     public float yoffset;
@@ -27,7 +28,8 @@ public class SDVEventTracker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Stored events: " + events.Count);
+        //if(!Application.isPlaying)
+        //    Debug.Log(gameObject.name + " Stored events: " + events.Count);
     }
 
     void getParent()
@@ -103,7 +105,6 @@ public class SDVEventTracker : MonoBehaviour
         }
         Debug.Log(sepparated_events);
     }
-
     private void OnDrawGizmos()
     {
         drawGizmos(false);
@@ -120,14 +121,16 @@ public class SDVEventTracker : MonoBehaviour
         {
             if (parent.selection == on_selected)
             {
+
                 Gizmos.color = color;
                 Vector3 pos = gameObject.transform.position;
                 pos.y += yoffset + parent.yoffset + (events.Count*parent.size_multiplier)/2;
                 Vector3 scale = Vector3.one * parent.size_multiplier;
                 if (!parent.sepparated)
                 {
-                    scale *= events.Count + 1;
+                    scale *= events.Count;
                     Gizmos.DrawCube(pos, scale);
+                    Gizmos.DrawCube(Vector3.zero, Vector3.one * 10);
                 }
                 else
                 {
@@ -156,7 +159,6 @@ public class SDVEventTracker : MonoBehaviour
             getParent();
         }
     }
-
 }
 
 //https://stackoverflow.com/questions/569903/multi-value-dictionary

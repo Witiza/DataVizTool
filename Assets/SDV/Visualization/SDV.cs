@@ -15,6 +15,7 @@ public class SDV : EditorWindow
     public float yoffset = 10;
 
     public GUIStyle inspector_title = new GUIStyle();
+    public GUIStyle subtitle = new GUIStyle();
     public GUIStyle text = new GUIStyle();
     public Color line_color;
 
@@ -39,6 +40,9 @@ public class SDV : EditorWindow
         inspector_title.fontSize = 20;
         inspector_title.normal.textColor = Color.white;
         inspector_title.alignment = TextAnchor.MiddleCenter;
+        subtitle.fontSize = 16;
+        subtitle.normal.textColor = Color.white;
+        subtitle.alignment = TextAnchor.MiddleCenter;
     }
 
     public bool checkIfUsingEvent(string name)
@@ -65,7 +69,7 @@ public class SDV : EditorWindow
         {
             if(tmp.name == name)
              {
-                Debug.Log("Name + Returnint : " + name+"   "+tmp.color);
+                //Debug.Log("Name + Returnint : " + name+"   "+tmp.color);
                 return tmp.color;
             }
         }

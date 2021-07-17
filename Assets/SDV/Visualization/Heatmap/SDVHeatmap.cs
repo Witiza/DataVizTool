@@ -84,13 +84,12 @@ public class SDVHeatmap : SDV
         max_z = 0;
         min_z = 0;
         max_events = 0;
-        calculateSize();
 
+        calculateSize();
 
         float x_dist = Mathf.Abs(max_x - min_x);
         float z_dist = Mathf.Abs(max_z - min_z);
 
-        //cute +1
         x_cells = Mathf.CeilToInt(x_dist / cube_size) + 1;
         z_cells = Mathf.CeilToInt(z_dist / cube_size) + 1;
         heatmap = new SDVHeatCube[x_cells, z_cells];
@@ -159,8 +158,44 @@ public class SDVHeatmap : SDV
         heatmap = null;
     }
 
+    public void RenderGizmos()
+    {
+        double t = Time.realtimeSinceStartupAsDouble;
+        selected_amount = 0;
+
+        if (heatmap != null)
+        {
+            for (int i = 0; i < heatmap.GetLength(0); i++)
+            {
+                for (int j = 0; j < heatmap.GetLength(1); j++)
+                {
+                    if (!visualize_selection || heatmap[i, j].selected)
+                    {
+                        switch (shape)
+                        {
+                            case HeatCubeShape.CUBE:
+                                heatmap[i, j].RenderGizmo(shape);
+                                break;
+                            case HeatCubeShape.SPHERE:
+                                heatmap[i, j].RenderGizmo(shape);
+                                break;
+                        }
+                    }
+                    if (heatmap[i, j].selected)
+                    {
+                        if (!selected.Contains(heatmap[i, j]))
+                        {
+                            selected.Add(heatmap[i, j]);
+                        }
+                    }
+                }
+            }
+        }
+        Debug.Log("Gizmo time: " + (Time.realtimeSinceStartupAsDouble-t));
+    }
     void RenderHeatMap()
     {
+        double t = Time.realtimeSinceStartupAsDouble;
         loadMeshes();
         selected_amount = 0;
 
@@ -184,15 +219,15 @@ public class SDVHeatmap : SDV
                     }
                     if(heatmap[i,j].selected)
                     {
-                       if(!selected.Contains(heatmap[i,j]))
-                       {
+                        selected_amount++;
+                        if (!selected.Contains(heatmap[i,j]))
+                        {
                             selected.Add(heatmap[i, j]);
                         }
                     }
                 }
             }
         }
-
     }
 
     void distributeEvents()
@@ -313,11 +348,17 @@ public class SDVHeatmap : SDV
 
     void OnSceneGUI(SceneView sv)
     {
-        //https://answers.unity.com/questions/594420/how-to-flush-mesh-batch-in-editor-or-how-to-draw-a.html
-        if (lastRenderedFrame != Time.renderedFrameCount)
+        if (Event.current.type == EventType.Layout)
         {
-            RenderHeatMap();
-            lastRenderedFrame = Time.renderedFrameCount;
+            getRenderer();
+            EditorUtility.SetDirty(renderer);
+            //https://answers.unity.com/questions/594420/how-to-flush-mesh-batch-in-editor-or-how-to-draw-a.html
+            if (lastRenderedFrame != Time.renderedFrameCount)
+            {
+                RenderHeatMap();
+                lastRenderedFrame = Time.renderedFrameCount;
+            }
+           
         }
 
         //doing this in update causes extreme lag bruv
@@ -378,7 +419,9 @@ public class SDVHeatmap : SDV
         }
         GUI.enabled = true;
         GUILayout.EndHorizontal();
+
         DrawUILine( 5, 20);
+        GUILayout.Label("Colouring\n", subtitle);
         EditorGUI.BeginChangeCheck();
         gradient = EditorGUILayout.GradientField("Color: ", gradient);
         if (EditorGUI.EndChangeCheck())
@@ -391,6 +434,8 @@ public class SDVHeatmap : SDV
         material = (Material)EditorGUILayout.ObjectField("Material: ",material, typeof(Material), true);
 
         DrawUILine(5, 20);
+        GUILayout.Label("Selection\n", subtitle);
+
         if (selecting)
         {
             if (GUILayout.Button("Stop HeatMap selection"))
@@ -410,41 +455,38 @@ public class SDVHeatmap : SDV
         if (EditorGUI.EndChangeCheck())
         {
             generateDictionary();
-            //THIS DOESNT WORK !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-           // 04/06 still does not work
            RenderHeatMap();
-            //EditorWindow view = EditorWindow.GetWindow<SceneView>();
-          //  SceneView.currentDrawingSceneView.Repaint();
             lastRenderedFrame = 0;
-           // view.Repaint();
         }
         DrawUILine(5, 20);
+        GUILayout.Label("Shape and Size\n", subtitle);
         shape = (HeatCubeShape)EditorGUILayout.EnumPopup("Heat Cubes Shape: ", shape);
-
-
         EditorGUI.BeginChangeCheck();
 
-        cube_size = EditorGUILayout.FloatField("Cube Size", cube_size);
+        cube_size = EditorGUILayout.DelayedFloatField("Cube Size", cube_size);
         if(EditorGUI.EndChangeCheck())
         {
             dirty = true;
         }
         EditorGUI.BeginChangeCheck();
 
-        modify_size = EditorGUILayout.Toggle("Modify Size", modify_size);
+        modify_size = EditorGUILayout.Toggle("Size Modifier", modify_size);
         if(modify_size)
-            size_multiplier  = EditorGUILayout.FloatField("Modifier Size", size_multiplier);
+            size_multiplier  = EditorGUILayout.DelayedFloatField("Modifier Size", size_multiplier);
         if (EditorGUI.EndChangeCheck())
         {
             adjoustmentsToCubes();
         }
         DrawUILine(5, 20);
+        GUILayout.Label("Information\n", subtitle);
+
         EditorGUILayout.LabelField("Selected Cubes: " + selected_amount);
         EditorGUILayout.LabelField("X cells: " + x_cells);
         EditorGUILayout.LabelField("Z cells: " + z_cells);
         EditorGUILayout.LabelField("Max events per cell: " + max_events);
 
         DrawUILine(5, 20);
+        GUILayout.Label("Bar Chart\n", subtitle);
 
         if (histogram.Count ==0)
         {
@@ -454,16 +496,19 @@ public class SDVHeatmap : SDV
         foreach(var entry in histogram)
         {
             GUILayout.BeginHorizontal();
+
             EditorGUILayout.LabelField(entry.Value.First.name + ": "+entry.Value.Second);
             Rect r = EditorGUILayout.GetControlRect();
-            r.width = ((float)entry.Value.Second/(float)max_histogram)*(position.width *2/3);
-            r.x -= position.width / 4;
-            Debug.Log("Width: " + r.width);
+            r.width = ((float)entry.Value.Second/(float)max_histogram)*(position.width *1/2);
+            r.x -= position.width / 10;
+            
 
             EditorGUI.DrawRect(r, getEventColor(entry.Value.First.name));
             GUILayout.EndHorizontal();
         }
         DrawUILine(5, 20);
+        GUILayout.Label("Events\n", subtitle);
+
         if (getEventHandler())
         {
             foreach(StandardEvent st_ev in event_handler.events)
@@ -510,7 +555,7 @@ public class SDVHeatmap : SDV
         bool ret = false;
         foreach(SDVEventContainer tmp in events)
         {
-            if(tmp.name == ev.name)
+            if(tmp.name == ev.name && !tmp.empty)
             {
                 ret = true;
             }

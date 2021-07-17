@@ -12,8 +12,8 @@ public class SDVEventContainer
     }
     public bool in_use = true;
     public string name;
-    public DataType data_type;
-    public DataEventType type;
+    public SDVDataType data_type;
+    public SDVEventType type;
     public List<SDVBaseEvent> events;
     public bool use_position;
     public bool use_target;
@@ -46,20 +46,19 @@ public class SDVBaseEvent
         if (_target != null)
         {
             SDVEventTracker tmp = _target.GetComponent<SDVEventTracker>();
-            //   Debug.Log(tmp.gameObject.name);
-            if (tmp != null)
+            SDVEventHandler handler = GameObject.FindObjectOfType<SDVEventHandler>();
+            if (tmp != null && handler != null)
             {
-                target_GUID = tmp.getGUID();
-                //Debug.Log("GUID: " + tmp.GUID);
+                if(handler.getType(_name) != SDVEventType.MULTI_TARGET)
+                {
+                    target_name = _target.name;
+                }
+                else
+                {
+                    target_GUID = tmp.getGUID();
+                    Debug.Log("GUID: " + tmp.getGUID());
+                }
             }
-            else
-            {
-                target_name = _target.name;
-            }
-            //else
-            //{
-            //    Debug.LogWarning("Trying to add GameObject " + _target + " to a multi targeted event without and EventTracker component");
-            //}
         }
 
     }
@@ -96,14 +95,16 @@ public class SDVBaseEvent
         }
         if(use_target)
         {
-
+            Debug.Log("Line "+line);
             start = end + 1;
             end = line.IndexOf(',', start);
             string subline = line.Substring(start, end - start);
+            Debug.Log(subline);
             if (subline[subline.Length-1] == '-')
             {
                 target_GUID = subline;
                 target_go = SDVCSVhandling.getGameObject(target_GUID);
+                Debug.Log(target_go);
             }
             else
             {

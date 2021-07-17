@@ -28,7 +28,7 @@ public static  class SDVCSVhandling
             {
                 file.Write("X,Y,Z,");
             }
-           if(events.type == DataEventType.MULTI_TARGET)
+           if(events.type == SDVEventType.MULTI_TARGET)
             { 
                 file.Write("TargetGUID,");
             }
@@ -68,42 +68,42 @@ public static  class SDVCSVhandling
             switch (data_type)
             {
                 case "NULL":
-                    ret.data_type = DataType.NULL;
+                    ret.data_type = SDVDataType.NULL;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new SDVBaseEvent(line, name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "BOOL":
-                    ret.data_type = DataType.BOOL;
+                    ret.data_type = SDVDataType.BOOL;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new SDVBoolEvent(line,name,ret.use_position,ret.use_target));
                      }
                     break;
                 case "INT":
-                    ret.data_type = DataType.INT;
+                    ret.data_type = SDVDataType.INT;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new SDVIntEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "FLOAT":
-                    ret.data_type = DataType.FLOAT;
+                    ret.data_type = SDVDataType.FLOAT;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new SDVFloatEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "STRING":
-                    ret.data_type = DataType.STRING;
+                    ret.data_type = SDVDataType.STRING;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new SDVStringEvent(line,name, ret.use_position, ret.use_target));
                     }
                     break;
                 case "VECTOR3":
-                    ret.data_type = DataType.VECTOR3;
+                    ret.data_type = SDVDataType.VECTOR3;
                     while ((line = file.ReadLine()) != null)
                     {
                         ret.events.Add(new SDVVector3Event(line,name, ret.use_position, ret.use_target ));
@@ -138,27 +138,27 @@ public static  class SDVCSVhandling
         return ret;
     }
 
-    public static string dataTypeToString(DataType data_type)
+    public static string dataTypeToString(SDVDataType data_type)
     {
         string ret = "ERROR";
         switch (data_type)
         {
-            case DataType.NULL:
+            case SDVDataType.NULL:
                 ret = "NULL";
                 break;
-            case DataType.BOOL:
+            case SDVDataType.BOOL:
                 ret = "BOOL";
                 break;
-            case DataType.INT:
+            case SDVDataType.INT:
                 ret = "INT";
                 break;
-            case DataType.FLOAT:
+            case SDVDataType.FLOAT:
                 ret = "FLOAT";
                 break;
-            case DataType.STRING:
+            case SDVDataType.STRING:
                 ret = "STRING";
                 break;
-            case DataType.VECTOR3:
+            case SDVDataType.VECTOR3:
                 ret = "VECTOR3";
                 break;
         }

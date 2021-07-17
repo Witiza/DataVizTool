@@ -7,7 +7,6 @@ public class SDVHeatCube
 {
     public List<SDVBaseEvent> events = new List<SDVBaseEvent>();
 
-    public Material lineMaterial =null;
     Material mat;
     public int max_events;
     public float alpha = 0;
@@ -49,14 +48,8 @@ public class SDVHeatCube
 
     public void generateColor()
     {
-      
         alpha = events_in_use / (float)max_events;
-        if(alpha != 0)
-        {
-            Debug.Log("Alpha: " + alpha);
-        }
         Color color = parent.gradient.Evaluate(alpha);
-      //  color.a = alpha;
         mat.color = color;
     }
   
@@ -65,6 +58,26 @@ public class SDVHeatCube
         if (alpha>0)
         {
             Graphics.DrawMesh(mesh, transform, mat, 0); //LAYER AS AN OPTION
+        }
+    }
+
+    public void RenderGizmo(HeatCubeShape shape)
+    {
+        if (alpha > 0)
+        {
+            Gizmos.color = mat.color;
+            switch (shape)
+            {
+                case HeatCubeShape.CUBE:
+                    Gizmos.DrawCube(position, scale);
+                    break;
+                case HeatCubeShape.SPHERE:
+                    Gizmos.DrawSphere(position, scale.magnitude);
+
+                    break;
+            }
+
+           
         }
     }
 
@@ -95,7 +108,7 @@ public class SDVHeatCube
         scale = new Vector3(parent.cube_size, parent.cube_size, parent.cube_size);
         if (parent.modify_size)
         {
-            scale *= parent.size_multiplier * events_in_use;
+            scale += Vector3.one *(parent.size_multiplier * events_in_use);
         }
     }
 

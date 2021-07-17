@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine.SceneManagement;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-public enum DataEventType
+public enum SDVEventType
 {
     POSITION,
     ROTATION,
@@ -15,7 +15,7 @@ public enum DataEventType
     MULTI_TARGET
 };
 
-public enum DataType
+public enum SDVDataType
 {
     NULL,
     BOOL,
@@ -29,6 +29,7 @@ public class SDVEventHandler : MonoBehaviour
 {
     public List<StandardEvent> events = new List<StandardEvent>();
 
+    static SDVEventHandler handler;
 
     void OnEnable()
     {
@@ -50,17 +51,6 @@ public class SDVEventHandler : MonoBehaviour
             }
         }
     }
-    private void Awake()
-    {
-        //HELLO?
-
-       
-    }
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -72,7 +62,7 @@ public class SDVEventHandler : MonoBehaviour
                 tmp.current_interval += Time.deltaTime;
                 if(tmp.current_interval >= tmp.interval )
                 {
-                    if (tmp.type == DataEventType.POSITION|| tmp.type == DataEventType.ROTATION|| tmp.type == DataEventType.TARGETED)
+                    if (tmp.type == SDVEventType.POSITION|| tmp.type == SDVEventType.ROTATION|| tmp.type == SDVEventType.TARGETED)
                     {
                         Vector3? pos = null;
                         if(tmp.save_position)
@@ -81,13 +71,13 @@ public class SDVEventHandler : MonoBehaviour
                         }
                         switch (tmp.type)
                         {
-                            case DataEventType.POSITION:
+                            case SDVEventType.POSITION:
                                 tmp.StoreEvent(tmp.target.transform.position ,tmp.target);
                                 break;
-                            case DataEventType.ROTATION:
+                            case SDVEventType.ROTATION:
                                 tmp.StoreEvent(tmp.target.transform.rotation.eulerAngles, pos,tmp.target);
                                 break;
-                            case DataEventType.TARGETED:
+                            case SDVEventType.TARGETED:
                                 tmp.s_obj.Update();
                                 switch(tmp.s_property.type)
                                 {
@@ -117,92 +107,130 @@ public class SDVEventHandler : MonoBehaviour
         }
     }
 
+    public  SDVEventType getType(string name)
+    {
+        SDVEventType ret = SDVEventType.NO_TARGET;
+        foreach(StandardEvent ev in events)
+        {
+            if(ev.name == name)
+            {
+                ret = ev.type;
+            }
+
+
+        }
+        Debug.Log(ret);
+        return ret;
+    }
     static public void StoreEventStatic(string event_name, bool data, Vector3? pos = null,GameObject target = null) 
     {
         //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
 
-        SDVEventHandler tmp;
-        if (tmp=  (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+        if (handler == null)
         {
-               tmp.StoreEvent(event_name, data,pos,target);
+            if (handler = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+            {
+                handler.StoreEvent(event_name, data, pos, target);
+            }
+            else
+            {
+                Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            }
         }
         else
         {
-            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            handler.StoreEvent(event_name, data, pos, target);
         }
     }
     static public void StoreEventStatic(string event_name, int data, Vector3? pos = null, GameObject target = null)
     {
-        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        SDVEventHandler tmp;
-        if (tmp = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+        if (handler == null)
         {
-           tmp.StoreEvent(event_name, data, pos,target);  
+            if (handler = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+            {
+                handler.StoreEvent(event_name, data, pos, target);
+            }
+            else
+            {
+                Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            }
         }
         else
         {
-            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            handler.StoreEvent(event_name, data, pos, target);
         }
     }
     static public void StoreEventStatic(string event_name, float data, Vector3? pos = null, GameObject target = null)
     {
-        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        SDVEventHandler tmp;
-        if (tmp = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+        if (handler == null)
         {
-
-            tmp.StoreEvent(event_name, data, pos,target);
-            
+            if (handler = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+            {
+                handler.StoreEvent(event_name, data, pos, target);
+            }
+            else
+            {
+                Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            }
         }
         else
         {
-            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            handler.StoreEvent(event_name, data, pos, target);
         }
     }
 
     static public void StoreEventStatic(string event_name, string data, Vector3? pos = null, GameObject target = null)
     {
-        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        SDVEventHandler tmp;
-        if (tmp = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+        if (handler == null)
         {
-
-            tmp.StoreEvent(event_name, data, pos, target);
-
+            if (handler = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+            {
+                handler.StoreEvent(event_name, data, pos, target);
+            }
+            else
+            {
+                Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            }
         }
         else
         {
-            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            handler.StoreEvent(event_name, data, pos, target);
         }
     }
     static public void StoreEventStatic(string event_name, Vector3 data, Vector3? pos = null, GameObject target = null)
     {
-        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        SDVEventHandler tmp;
-        if (tmp = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+        if (handler == null)
         {
-
-            tmp.StoreEvent(event_name, data, pos,target);
-            
+            if (handler = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+            {
+                handler.StoreEvent(event_name, data, pos, target);
+            }
+            else
+            {
+                Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            }
         }
         else
         {
-            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            handler.StoreEvent(event_name, data, pos, target);
         }
     }
     static public void StoreEventStatic(string event_name, Vector3? pos = null, GameObject target = null)
     {
-        //Weird https://es.stackoverflow.com/questions/172069/error-cs0201-only-assignment-call-increment-decrement-await-and-new-object
-        SDVEventHandler tmp;
-        if (tmp = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+        if (handler == null)
         {
-
-            tmp.StoreEvent(event_name, pos, target);
-
+            if (handler = (SDVEventHandler)FindObjectOfType(typeof(SDVEventHandler)))
+            {
+                handler.StoreEvent(event_name, pos, target);
+            }
+            else
+            {
+                Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            }
         }
         else
         {
-            Debug.LogError("Trying to store an event without an EventHandler in the scene");
+            handler.StoreEvent(event_name, pos, target);
         }
     }
 
@@ -370,7 +398,7 @@ public class SDVEventHandler : MonoBehaviour
                 }
                 else
                 {
-                    if (events[i].type != DataEventType.POSITION)
+                    if (events[i].type != SDVEventType.POSITION)
                     {
                         var component = events[i].target.GetComponent(events[i].script_name);
                         if (component)
@@ -449,40 +477,40 @@ public class EventHandlerEditor : Editor
                         GUI.enabled = false;
                     }
                     EditorGUI.BeginChangeCheck();
-                    tmp.type = (DataEventType)EditorGUILayout.EnumPopup("Event Type: ", tmp.type);
+                    tmp.type = (SDVEventType)EditorGUILayout.EnumPopup("Event Type: ", tmp.type);
                     if(EditorGUI.EndChangeCheck())
                     {
                         switch(tmp.type)
                         {
-                            case DataEventType.POSITION:
-                                tmp.data_type = DataType.NULL;
+                            case SDVEventType.POSITION:
+                                tmp.data_type = SDVDataType.NULL;
                                 tmp.save_position = true;
                                 tmp.use_target = true;
                                 tmp.use_frequency = true;
                                 break;
-                            case DataEventType.ROTATION:
-                                tmp.data_type = DataType.VECTOR3;
+                            case SDVEventType.ROTATION:
+                                tmp.data_type = SDVDataType.VECTOR3;
                                 tmp.save_position = true;
                                 tmp.use_target = true;
                                 tmp.use_frequency = true;
                                 break;
-                            case DataEventType.NO_TARGET: 
+                            case SDVEventType.NO_TARGET: 
                                 tmp.use_target = false;
                                 tmp.save_position = false;
                                 tmp.use_frequency = false;
                                 break;
-                            case DataEventType.MULTI_TARGET:
-                                tmp.use_target = false;
+                            case SDVEventType.MULTI_TARGET:
+                                tmp.use_target = true;
                                 tmp.save_position = false;
                                 tmp.use_frequency = false;
                                 break;
-                            case DataEventType.TARGETED:
+                            case SDVEventType.TARGETED:
                                 tmp.use_frequency = true;
                                 tmp.use_target = true;
                                 break;
                         }
                     }
-                    if (tmp.use_target)
+                    if (tmp.use_target&&tmp.type != SDVEventType.MULTI_TARGET)
                     {
                         EditorGUI.BeginChangeCheck();
                         tmp.target = (GameObject)EditorGUILayout.ObjectField("Target GameObject", tmp.target, typeof(GameObject), true);
@@ -490,7 +518,7 @@ public class EventHandlerEditor : Editor
                         {
                             tmp.target_name = tmp.target.name;
                         }
-                        if (tmp.target != null && tmp.type == DataEventType.TARGETED)
+                        if (tmp.target != null && tmp.type == SDVEventType.TARGETED)
                         {
                             EditorGUI.BeginChangeCheck();
                             tmp.script_name = EditorGUILayout.TextField("Script containing the variable", tmp.script_name);
@@ -522,17 +550,20 @@ public class EventHandlerEditor : Editor
 
                         }
                     }
-                    if (tmp.type == DataEventType.TARGETED)
+                    if (tmp.type == SDVEventType.TARGETED||tmp.type == SDVEventType.MULTI_TARGET)
                     {
-                        tmp.use_frequency = EditorGUILayout.Toggle("Use Frequency", tmp.use_frequency);
+                        if (tmp.type == SDVEventType.TARGETED)
+                        {
+                            tmp.use_frequency = EditorGUILayout.Toggle("Use Frequency", tmp.use_frequency);
+                        }
                         tmp.save_position = EditorGUILayout.Toggle("Save Position", tmp.save_position);
                     }
                   if(tmp.use_frequency)
                     {
                         tmp.interval = EditorGUILayout.FloatField("Event Frequency", tmp.interval);
                     }
-                  
-                    tmp.data_type = (DataType)EditorGUILayout.EnumPopup("Data Type: ", tmp.data_type);
+                  if(tmp.type != SDVEventType.POSITION && tmp.type != SDVEventType.ROTATION )
+                    tmp.data_type = (SDVDataType)EditorGUILayout.EnumPopup("Data Type: ", tmp.data_type);
                     if (GUILayout.Button("Delete Event"))
                     {
                         handler.events.RemoveAt(i);
@@ -577,8 +608,8 @@ public class StandardEvent
     Vector3 position;
    [System.NonSerialized]
     public List<SDVBaseEvent> ingame_events;
-    public DataEventType type;
-    public DataType data_type;
+    public SDVEventType type;
+    public SDVDataType data_type;
     public bool use_frequency = false;
     public bool save_position = false;
     public bool use_target = false;
@@ -607,8 +638,8 @@ public class StandardEvent
     {
         name = "EVENTNAME";
        // generateID();
-        type =DataEventType.NO_TARGET;
-        data_type = DataType.INT;
+        type =SDVEventType.NO_TARGET;
+        data_type = SDVDataType.INT;
         ingame_events = new List<SDVBaseEvent>();
       //  scene = SceneManager.GetActiveScene().name;
     }
